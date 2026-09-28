@@ -79,8 +79,15 @@ TEMPLATES = [
 WSGI_APPLICATION = 'royalcare_project.wsgi.application'
 
 # Database Configuration
-USE_SQLITE = os.environ.get('USE_SQLITE', 'True').lower() in ['true', '1']
 IS_VERCEL = bool(os.environ.get('VERCEL') or os.environ.get('NOW_REGION'))
+DB_HOST = os.environ.get('DB_HOST', '').strip()
+USE_SQLITE_ENV = os.environ.get('USE_SQLITE', '').strip().lower()
+
+# Default to SQLite unless DB_HOST is explicitly provided and USE_SQLITE is not 'true'
+if USE_SQLITE_ENV in ['true', '1'] or not DB_HOST:
+    USE_SQLITE = True
+else:
+    USE_SQLITE = False
 
 if USE_SQLITE:
     if IS_VERCEL:
@@ -103,13 +110,19 @@ if USE_SQLITE:
         }
     }
 else:
+    try:
+        import pymysql
+        pymysql.install_as_MySQLdb()
+    except Exception:
+        pass
+
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
             'NAME': os.environ.get('DB_NAME', 'royalcare_db'),
             'USER': os.environ.get('DB_USER', 'root'),
             'PASSWORD': os.environ.get('DB_PASSWORD', ''),
-            'HOST': os.environ.get('DB_HOST', 'localhost'),
+            'HOST': DB_HOST or 'localhost',
             'PORT': os.environ.get('DB_PORT', '3306'),
             'OPTIONS': {
                 'charset': 'utf8mb4',
