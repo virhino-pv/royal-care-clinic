@@ -80,12 +80,26 @@ WSGI_APPLICATION = 'royalcare_project.wsgi.application'
 
 # Database Configuration
 USE_SQLITE = os.environ.get('USE_SQLITE', 'True').lower() in ['true', '1']
+IS_VERCEL = bool(os.environ.get('VERCEL') or os.environ.get('NOW_REGION'))
 
 if USE_SQLITE:
+    if IS_VERCEL:
+        import shutil
+        tmp_db = Path('/tmp/royalcare_clinic.sqlite3')
+        orig_db = BASE_DIR / 'royalcare_clinic.sqlite3'
+        if not tmp_db.exists() and orig_db.exists():
+            try:
+                shutil.copy2(orig_db, tmp_db)
+            except Exception as e:
+                pass
+        db_path = tmp_db
+    else:
+        db_path = BASE_DIR / 'royalcare_clinic.sqlite3'
+
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'royalcare_clinic.sqlite3',
+            'NAME': db_path,
         }
     }
 else:
