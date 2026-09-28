@@ -1,0 +1,331 @@
+{% extends 'dashboard_base.html' %}
+{% load humanize %}
+
+{% block title %}Healthcare Analytics & Power BI Data Engine — {{ CLINIC.NAME }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+  <div>
+    <h3 class="fw-bold mb-1">Healthcare Analytics & Business Intelligence</h3>
+    <p class="text-muted small mb-0">Python + Pandas Statistical Engine • Power BI Dimensional Star-Schema Ready</p>
+  </div>
+  <div class="d-flex flex-wrap gap-2">
+    <a href="{% url 'export_excel_report' %}" class="btn btn-success btn-sm">
+      <i class="bi bi-file-earmark-excel-fill me-1"></i> Export Multi-Sheet Excel (.xlsx)
+    </a>
+    <a href="{% url 'export_powerbi_bundle' %}" class="btn btn-primary-custom btn-sm">
+      <i class="bi bi-file-earmark-zip-fill me-1"></i> Download Power BI Star-Schema ZIP
+    </a>
+  </div>
+</div>
+
+<!-- KPI Metrics Grid -->
+<div class="row g-3 mb-4">
+  <!-- Patients Summary -->
+  <div class="col-xl-3 col-sm-6">
+    <div class="stat-card">
+      <div class="stat-icon-wrapper bg-primary bg-opacity-10 text-primary">
+        <i class="bi bi-people-fill"></i>
+      </div>
+      <div>
+        <div class="stat-value">{{ summary.total_patients }}</div>
+        <div class="stat-label">Total Patients</div>
+        <small class="text-primary fw-semibold">{{ summary.returning_patients }} Returning ({{ summary.new_vs_returning_ratio }}%)</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Appointments Summary -->
+  <div class="col-xl-3 col-sm-6">
+    <div class="stat-card">
+      <div class="stat-icon-wrapper bg-info bg-opacity-10 text-info">
+        <i class="bi bi-calendar2-check-fill"></i>
+      </div>
+      <div>
+        <div class="stat-value">{{ summary.total_appointments }}</div>
+        <div class="stat-label">Total Appointments</div>
+        <small class="text-success fw-semibold">{{ summary.completion_rate }}% Completed • {{ summary.no_show_rate }}% No-Show</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Revenue Summary -->
+  <div class="col-xl-3 col-sm-6">
+    <div class="stat-card">
+      <div class="stat-icon-wrapper bg-success bg-opacity-10 text-success">
+        <i class="bi bi-currency-rupee"></i>
+      </div>
+      <div>
+        <div class="stat-value text-success">₹{{ summary.total_revenue|floatformat:0|intcomma }}</div>
+        <div class="stat-label">Total Realized Revenue</div>
+        <small class="text-muted">₹{{ summary.total_outstanding|floatformat:0|intcomma }} Outstanding</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Diagnostic Lab Volume -->
+  <div class="col-xl-3 col-sm-6">
+    <div class="stat-card">
+      <div class="stat-icon-wrapper bg-warning bg-opacity-10 text-warning">
+        <i class="bi bi-droplet-half"></i>
+      </div>
+      <div>
+        <div class="stat-value">{{ summary.total_tests_conducted }}</div>
+        <div class="stat-label">Diagnostic Tests Conducted</div>
+        <small class="text-warning fw-semibold">{{ summary.total_lab_orders }} Lab Orders Processed</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Charts Row 1 -->
+<div class="row g-4 mb-4">
+  <div class="col-lg-8">
+    <div class="card card-custom p-4 h-100">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold text-dark mb-0"><i class="bi bi-graph-up text-primary me-2"></i>Daily Appointment Trends (Last 14 Days)</h5>
+        <a href="{% url 'export_csv_report' 'FactAppointments' %}" class="btn btn-sm btn-outline-secondary">
+          <i class="bi bi-download me-1"></i> CSV
+        </a>
+      </div>
+      <div style="position: relative; height: 280px;">
+        <canvas id="appointmentTrendsChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card card-custom p-4 h-100">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold text-dark mb-0"><i class="bi bi-clock-history text-warning me-2"></i>Peak OPD Consultation Hours</h5>
+      </div>
+      <div style="position: relative; height: 280px;">
+        <canvas id="peakHoursChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Charts Row 2 -->
+<div class="row g-4 mb-4">
+  <div class="col-lg-6">
+    <div class="card card-custom p-4 h-100">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold text-dark mb-0"><i class="bi bi-cash-stack text-success me-2"></i>Monthly Revenue Trends (OPD vs Diagnostics)</h5>
+        <a href="{% url 'export_csv_report' 'FactBilling' %}" class="btn btn-sm btn-outline-secondary">
+          <i class="bi bi-download me-1"></i> CSV
+        </a>
+      </div>
+      <div style="position: relative; height: 260px;">
+        <canvas id="monthlyRevenueChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card card-custom p-4 h-100">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold text-dark mb-0"><i class="bi bi-pie-chart text-info me-2"></i>Revenue by Payment Method</h5>
+      </div>
+      <div style="position: relative; height: 260px;">
+        <canvas id="paymentMethodsChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Doctor-wise Performance Table -->
+<div class="card card-custom p-4 mb-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="fw-bold text-dark mb-0"><i class="bi bi-person-badge text-primary me-2"></i>Doctor Performance & Utilization Metrics</h5>
+    <a href="{% url 'export_csv_report' 'DimDoctor' %}" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-download me-1"></i> Export Doctor CSV
+    </a>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0 small">
+      <thead class="table-light">
+        <tr>
+          <th>Doctor Name</th>
+          <th>Specialty</th>
+          <th>Total Consultations</th>
+          <th>Completed</th>
+          <th>Cancelled</th>
+          <th>No-Show</th>
+          <th>Completion %</th>
+          <th class="text-end">Revenue Contribution</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for doc in doctor_perf %}
+          <tr>
+            <td class="fw-bold text-dark">{{ doc.doctor_name }}</td>
+            <td><span class="badge bg-light text-primary border">{{ doc.specialty }}</span></td>
+            <td>{{ doc.total_appointments }}</td>
+            <td class="text-success fw-bold">{{ doc.completed }}</td>
+            <td class="text-danger">{{ doc.cancelled }}</td>
+            <td class="text-muted">{{ doc.no_show }}</td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <div class="progress flex-grow-1" style="height: 6px;">
+                  <div class="progress-bar bg-success" style="width: {{ doc.completion_pct }}%;"></div>
+                </div>
+                <span>{{ doc.completion_pct }}%</span>
+              </div>
+            </td>
+            <td class="text-end fw-bold text-success fs-6">₹{{ doc.revenue|floatformat:0|intcomma }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="8" class="text-center text-muted py-4">No doctor metrics available yet.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Lab Test Demand Analysis -->
+<div class="card card-custom p-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="fw-bold text-dark mb-0"><i class="bi bi-droplet-half text-warning me-2"></i>Diagnostic Laboratory Test Demand & Revenue</h5>
+    <a href="{% url 'export_csv_report' 'FactLabOrders' %}" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-download me-1"></i> Export Lab CSV
+    </a>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0 small">
+      <thead class="table-light">
+        <tr>
+          <th>Test Code</th>
+          <th>Test Description</th>
+          <th>Category</th>
+          <th>Orders Processed</th>
+          <th class="text-end">Total Revenue Generated</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for test in lab_demand %}
+          <tr>
+            <td><span class="badge bg-primary bg-opacity-10 text-primary fw-bold">{{ test.code }}</span></td>
+            <td class="fw-bold text-dark">{{ test.test_name }}</td>
+            <td>{{ test.category }}</td>
+            <td><span class="badge bg-light text-dark border">{{ test.order_count }} Orders</span></td>
+            <td class="text-end fw-bold text-primary fs-6">₹{{ test.total_revenue|floatformat:0|intcomma }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="5" class="text-center text-muted py-4">No diagnostic lab test orders recorded yet.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Parse Backend JSON Datasets
+  const apptTrendsData = {{ appt_trends_json|safe }};
+  const peakHoursData = {{ peak_hours_json|safe }};
+  const monthlyRevData = {{ monthly_rev_json|safe }};
+  const paymentDistData = {{ payment_dist_json|safe }};
+
+  // 1. Appointment Trends Chart
+  const ctxTrends = document.getElementById('appointmentTrendsChart').getContext('2d');
+  new Chart(ctxTrends, {
+    type: 'line',
+    data: {
+      labels: apptTrendsData.dates.length ? apptTrendsData.dates : ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5'],
+      datasets: [
+        {
+          label: 'Total Booked',
+          data: apptTrendsData.total.length ? apptTrendsData.total : [4, 6, 8, 5, 7],
+          borderColor: '#0d3b66',
+          backgroundColor: 'rgba(13, 59, 102, 0.1)',
+          tension: 0.3,
+          fill: true
+        },
+        {
+          label: 'Completed',
+          data: apptTrendsData.completed.length ? apptTrendsData.completed : [3, 5, 7, 4, 6],
+          borderColor: '#10b981',
+          backgroundColor: 'rgba(16, 185, 129, 0.1)',
+          tension: 0.3
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { position: 'top' } }
+    }
+  });
+
+  // 2. Peak Hours Bar Chart
+  const ctxHours = document.getElementById('peakHoursChart').getContext('2d');
+  new Chart(ctxHours, {
+    type: 'bar',
+    data: {
+      labels: peakHoursData.hours,
+      datasets: [{
+        label: 'Patients',
+        data: peakHoursData.counts,
+        backgroundColor: '#00a896',
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } }
+    }
+  });
+
+  // 3. Monthly Revenue Chart
+  const ctxRev = document.getElementById('monthlyRevenueChart').getContext('2d');
+  new Chart(ctxRev, {
+    type: 'bar',
+    data: {
+      labels: monthlyRevData.months.length ? monthlyRevData.months : ['Jan 2026', 'Feb 2026', 'Mar 2026'],
+      datasets: [
+        {
+          label: 'Doctor Consultation (₹)',
+          data: monthlyRevData.consultation.length ? monthlyRevData.consultation : [12000, 18000, 24000],
+          backgroundColor: '#0d3b66'
+        },
+        {
+          label: 'Diagnostic Lab (₹)',
+          data: monthlyRevData.lab.length ? monthlyRevData.lab : [8500, 14200, 19800],
+          backgroundColor: '#02c39a'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: { x: { stacked: true }, y: { stacked: true } }
+    }
+  });
+
+  // 4. Payment Method Doughnut Chart
+  const ctxPay = document.getElementById('paymentMethodsChart').getContext('2d');
+  new Chart(ctxPay, {
+    type: 'doughnut',
+    data: {
+      labels: paymentDistData.methods,
+      datasets: [{
+        data: paymentDistData.amounts,
+        backgroundColor: ['#10b981', '#0284c7', '#f59e0b', '#6366f1']
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false
+    }
+  });
+</script>
+{% endblock %}

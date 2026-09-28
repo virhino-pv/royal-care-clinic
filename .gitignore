@@ -1,0 +1,11 @@
+# Python & Django
+__pycache__/
+*.py[cod]
+*$py.class
+*.sqlite3
+staticfiles/
+media/
+.env
+venv/
+.venv/
+.DS_Store

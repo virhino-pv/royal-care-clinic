@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Booking Confirmed — {{ CLINIC.NAME }}{% endblock %}
+
+{% block content %}
+<div class="container py-5 text-center">
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
+      <div class="card card-custom p-5 shadow-lg">
+        <div class="mb-4">
+          <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center shadow" style="width: 80px; height: 80px;">
+            <i class="bi bi-check-lg fs-1"></i>
+          </div>
+        </div>
+
+        <h3 class="fw-bold text-dark mb-2">Booking Confirmed!</h3>
+        <p class="text-muted mb-4">
+          Thank you, <strong>{{ patient.full_name }}</strong>. Your request has been successfully registered in our system.
+        </p>
+
+        {% if type == 'appointment' %}
+          <div class="p-3 bg-light rounded-4 text-start mb-4">
+            <div class="d-flex justify-content-between py-1 border-bottom">
+              <span class="text-muted">Appointment Ref:</span>
+              <span class="fw-bold text-primary">#APT-{{ appointment.id }}</span>
+            </div>
+            <div class="d-flex justify-content-between py-1 border-bottom">
+              <span class="text-muted">Consulting Doctor:</span>
+              <span class="fw-bold">{{ appointment.doctor.doctor_name }}</span>
+            </div>
+            <div class="d-flex justify-content-between py-1 border-bottom">
+              <span class="text-muted">Date & Time:</span>
+              <span class="fw-bold">{{ appointment.appointment_date }} at {{ appointment.appointment_time|time:"h:i A" }}</span>
+            </div>
+            <div class="d-flex justify-content-between py-1">
+              <span class="text-muted">Consultation Fee:</span>
+              <span class="fw-bold text-success">₹{{ appointment.fee|floatformat:0 }}</span>
+            </div>
+          </div>
+        {% elif type == 'lab' %}
+          <div class="p-3 bg-light rounded-4 text-start mb-4">
+            <div class="d-flex justify-content-between py-1 border-bottom">
+              <span class="text-muted">Lab Order Number:</span>
+              <span class="fw-bold text-primary">{{ order.order_number }}</span>
+            </div>
+            <div class="d-flex justify-content-between py-1 border-bottom">
+              <span class="text-muted">Tests Booked:</span>
+              <span class="fw-bold">{{ order.items.count }} Tests</span>
+            </div>
+            <div class="d-flex justify-content-between py-1">
+              <span class="text-muted">Total Amount:</span>
+              <span class="fw-bold text-success">₹{{ order.total_amount|floatformat:0 }}</span>
+            </div>
+          </div>
+        {% endif %}
+
+        <div class="d-flex flex-column gap-2">
+          <a href="{% url 'home' %}" class="btn btn-primary-custom">
+            <i class="bi bi-house-door me-1"></i> Return to Homepage
+          </a>
+          <a href="https://wa.me/{{ CLINIC.WHATSAPP }}?text=Hello%20Royal%20Care,%20I%20have%20booked%20reference%20for%20{{ patient.full_name }}." target="_blank" class="btn btn-outline-success">
+            <i class="bi bi-whatsapp me-1"></i> Send Confirmation to WhatsApp
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

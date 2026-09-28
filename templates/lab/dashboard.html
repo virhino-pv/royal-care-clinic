@@ -1,0 +1,147 @@
+{% extends 'dashboard_base.html' %}
+{% load humanize %}
+
+{% block title %}Diagnostic Lab Dashboard — {{ CLINIC.NAME }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+  <div>
+    <h3 class="fw-bold mb-1">Diagnostic Laboratory Operations</h3>
+    <p class="text-muted small mb-0">Specimen intake, analyzer queues, verified test result delivery, and pathology catalog.</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'lab_order_create' %}" class="btn btn-primary-custom">
+      <i class="bi bi-plus-circle me-1"></i> New Lab Order
+    </a>
+    <a href="{% url 'test_catalog' %}" class="btn btn-outline-primary">
+      <i class="bi bi-grid-3x3-gap me-1"></i> Tests Catalog
+    </a>
+  </div>
+</div>
+
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-xl-3 col-sm-6">
+    <div class="stat-card">
+      <div class="stat-icon-wrapper bg-primary bg-opacity-10 text-primary">
+        <i class="bi bi-folder-check"></i>
+      </div>
+      <div>
+        <div class="stat-value">{{ total_orders }}</div>
+        <div class="stat-label">Total Lab Orders</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-3 col-sm-6">
+    <div class="stat-card">
+      <div class="stat-icon-wrapper bg-warning bg-opacity-10 text-warning">
+        <i class="bi bi-droplet"></i>
+      </div>
+      <div>
+        <div class="stat-value">{{ pending_samples }}</div>
+        <div class="stat-label">Pending Collection</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-3 col-sm-6">
+    <div class="stat-card">
+      <div class="stat-icon-wrapper bg-info bg-opacity-10 text-info">
+        <i class="bi bi-activity"></i>
+      </div>
+      <div>
+        <div class="stat-value">{{ in_analysis }}</div>
+        <div class="stat-label">Under Testing</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-3 col-sm-6">
+    <div class="stat-card">
+      <div class="stat-icon-wrapper bg-success bg-opacity-10 text-success">
+        <i class="bi bi-check2-circle"></i>
+      </div>
+      <div>
+        <div class="stat-value">{{ completed }}</div>
+        <div class="stat-label">Verified & Delivered</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Orders Queue -->
+<div class="card card-custom p-4 mb-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="fw-bold text-dark mb-0"><i class="bi bi-clock-history me-2 text-primary"></i>Diagnostic Worklist & Queue</h5>
+    <a href="{% url 'lab_order_list' %}" class="small fw-bold text-decoration-none">View All Orders</a>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0 small">
+      <thead class="table-light">
+        <tr>
+          <th>Order Number</th>
+          <th>Patient</th>
+          <th>Date</th>
+          <th>Tests Ordered</th>
+          <th>Priority</th>
+          <th>Status</th>
+          <th>Amount</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in recent_orders %}
+          <tr>
+            <td>
+              <a href="{% url 'lab_order_detail' order.pk %}" class="fw-bold text-primary text-decoration-none">
+                {{ order.order_number }}
+              </a>
+            </td>
+            <td>
+              <a href="{% url 'patient_detail' order.patient.pk %}" class="fw-bold text-dark text-decoration-none">
+                {{ order.patient.full_name }}
+              </a>
+              <div class="text-muted" style="font-size: 0.75rem;">{{ order.patient.phone }}</div>
+            </td>
+            <td>{{ order.order_date }}</td>
+            <td>
+              {% for item in order.items.all %}
+                <span class="badge bg-light text-dark border">{{ item.test.code }}</span>
+              {% endfor %}
+            </td>
+            <td>
+              <span class="badge {% if order.priority == 'stat' %}bg-danger{% elif order.priority == 'urgent' %}bg-warning text-dark{% else %}bg-light text-muted border{% endif %}">
+                {{ order.get_priority_display }}
+              </span>
+            </td>
+            <td>
+              <span class="badge bg-secondary bg-opacity-25 text-dark">{{ order.get_status_display }}</span>
+            </td>
+            <td class="fw-bold">₹{{ order.total_amount|floatformat:0 }}</td>
+            <td class="text-end">
+              <a href="{% url 'lab_order_detail' order.pk %}" class="btn btn-sm btn-outline-primary py-0 px-2">
+                Open
+              </a>
+              {% if order.status != 'completed' %}
+                <a href="{% url 'lab_enter_results' order.pk %}" class="btn btn-sm btn-success py-0 px-2" title="Enter Results">
+                  <i class="bi bi-pencil-square"></i>
+                </a>
+              {% else %}
+                <a href="{% url 'lab_report_print' order.pk %}" target="_blank" class="btn btn-sm btn-outline-secondary py-0 px-2" title="Print Report">
+                  <i class="bi bi-printer"></i>
+                </a>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="8" class="text-center text-muted py-4">No lab orders active in queue.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

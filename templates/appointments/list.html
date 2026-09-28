@@ -1,0 +1,122 @@
+{% extends 'dashboard_base.html' %}
+
+{% block title %}Appointments & Booking Manager — {{ CLINIC.NAME }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+  <div>
+    <h3 class="fw-bold mb-1">Appointment Roster & Scheduling</h3>
+    <p class="text-muted small mb-0">Track scheduled, confirmed, in-progress, completed, and cancelled consultations.</p>
+  </div>
+  <div>
+    <a href="{% url 'appointment_create' %}" class="btn btn-primary-custom">
+      <i class="bi bi-calendar-plus-fill me-1"></i> Book New Appointment
+    </a>
+  </div>
+</div>
+
+<!-- Filters Card -->
+<div class="card card-custom p-3 mb-4">
+  <form method="GET" class="row g-2 align-items-center">
+    <div class="col-md-3">
+      <label class="form-label small fw-semibold mb-1">Filter by Date</label>
+      <input type="date" name="date" class="form-control form-control-sm" value="{{ date_filter }}">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label small fw-semibold mb-1">Filter by Status</label>
+      <select name="status" class="form-select form-select-sm">
+        <option value="">-- All Statuses --</option>
+        <option value="scheduled" {% if status_filter == 'scheduled' %}selected{% endif %}>Scheduled</option>
+        <option value="confirmed" {% if status_filter == 'confirmed' %}selected{% endif %}>Confirmed</option>
+        <option value="in_progress" {% if status_filter == 'in_progress' %}selected{% endif %}>In Progress</option>
+        <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
+        <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
+        <option value="no_show" {% if status_filter == 'no_show' %}selected{% endif %}>No-Show</option>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label small fw-semibold mb-1">Filter by Doctor</label>
+      <select name="doctor" class="form-select form-select-sm">
+        <option value="">-- All Doctors --</option>
+        {% for doc in doctors %}
+          <option value="{{ doc.id }}" {% if doctor_filter == doc.id|stringformat:"i" %}selected{% endif %}>{{ doc.doctor_name }} ({{ doc.specialization }})</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2 d-flex align-items-end gap-2">
+      <button type="submit" class="btn btn-primary-custom btn-sm w-100">Filter</button>
+      {% if date_filter or status_filter or doctor_filter %}
+        <a href="{% url 'appointment_list' %}" class="btn btn-light btn-sm"><i class="bi bi-x-lg"></i></a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+
+<!-- Appointments Table -->
+<div class="card card-custom overflow-hidden">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Ref</th>
+          <th>Patient Name</th>
+          <th>Doctor / Specialty</th>
+          <th>Date & Slot</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Fee</th>
+          <th class="text-end">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for appt in appointments %}
+          <tr>
+            <td>
+              <span class="fw-bold text-muted">#{{ appt.id }}</span>
+            </td>
+            <td>
+              <a href="{% url 'patient_detail' appt.patient.pk %}" class="fw-bold text-dark text-decoration-none">
+                {{ appt.patient.full_name }}
+              </a>
+              <div class="text-muted small">{{ appt.patient.phone }}</div>
+            </td>
+            <td>
+              <div class="fw-semibold">{{ appt.doctor.doctor_name }}</div>
+              <small class="text-muted">{{ appt.doctor.specialization }} (Room {{ appt.doctor.room_number }})</small>
+            </td>
+            <td>
+              <div class="fw-bold">{{ appt.appointment_date }}</div>
+              <div class="text-primary small fw-semibold">{{ appt.appointment_time|time:"h:i A" }}</div>
+            </td>
+            <td>
+              <span class="badge bg-light text-dark border">{{ appt.get_appointment_type_display }}</span>
+            </td>
+            <td>
+              <span class="badge badge-status badge-{{ appt.status }}">{{ appt.get_status_display }}</span>
+            </td>
+            <td class="fw-bold">
+              ₹{{ appt.fee|floatformat:0 }}
+            </td>
+            <td class="text-end">
+              <div class="btn-group btn-group-sm">
+                <a href="{% url 'appointment_detail' appt.pk %}" class="btn btn-outline-primary" title="Open Details">
+                  <i class="bi bi-eye"></i>
+                </a>
+                {% if appt.status != 'completed' and appt.status != 'cancelled' %}
+                  <a href="{% url 'appointment_status_update' appt.pk 'completed' %}" class="btn btn-outline-success" title="Mark Completed">
+                    <i class="bi bi-check-lg"></i>
+                  </a>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="8" class="text-center text-muted py-5">No appointments found matching your filter criteria.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

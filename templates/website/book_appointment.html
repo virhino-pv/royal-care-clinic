@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Doctor Appointment — {{ CLINIC.NAME }}{% endblock %}
+
+{% block content %}
+<div class="bg-primary text-white py-5">
+  <div class="container">
+    <h1 class="fw-bold mb-2">Book a Specialist Appointment</h1>
+    <p class="text-white-50 mb-0">Select your preferred doctor, clinical specialty, and time slot.</p>
+  </div>
+</div>
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card card-custom p-4 p-md-5">
+        <form method="POST">
+          {% csrf_token %}
+          <h5 class="fw-bold text-primary mb-3 pb-2 border-bottom">1. Patient Information</h5>
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">First Name *</label>
+              <input type="text" name="first_name" class="form-control" required placeholder="Patient First Name">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Last Name</label>
+              <input type="text" name="last_name" class="form-control" placeholder="Last Name">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Mobile Phone (WhatsApp) *</label>
+              <input type="tel" name="phone" class="form-control" required placeholder="9840012345">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Email Address</label>
+              <input type="email" name="email" class="form-control" placeholder="name@domain.com">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Gender</label>
+              <select name="gender" class="form-select">
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Date of Birth</label>
+              <input type="date" name="date_of_birth" class="form-control">
+            </div>
+          </div>
+
+          <h5 class="fw-bold text-primary mb-3 pb-2 border-bottom">2. Appointment Details</h5>
+          <div class="row g-3 mb-4">
+            <div class="col-12">
+              <label class="form-label small fw-semibold">Select Doctor / Specialist *</label>
+              <select name="doctor_id" id="doctorSelect" class="form-select" required>
+                <option value="">-- Choose Doctor --</option>
+                {% for doc in doctors %}
+                  <option value="{{ doc.id }}" {% if request.GET.doctor == doc.id|stringformat:"i" %}selected{% endif %}>
+                    {{ doc.doctor_name }} — {{ doc.specialization }} (Fee: ₹{{ doc.consultation_fee|floatformat:0 }})
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Appointment Date *</label>
+              <input type="date" name="appointment_date" id="apptDate" class="form-control" required>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Appointment Time Slot *</label>
+              <input type="time" name="appointment_time" class="form-control" required>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label small fw-semibold">Symptoms / Reason for Visit</label>
+              <textarea name="reason" class="form-control" rows="2" placeholder="Briefly describe what symptoms you are experiencing"></textarea>
+            </div>
+          </div>
+
+          <div class="p-3 bg-light rounded-3 mb-4 small text-muted">
+            <i class="bi bi-info-circle text-primary me-1"></i>
+            Consultation fee can be paid at the clinic reception via Cash, Card, or UPI (GPay/PhonePe).
+          </div>
+
+          <button type="submit" class="btn btn-primary-custom btn-lg w-100">
+            <i class="bi bi-check-circle-fill me-1"></i> Confirm Appointment Booking
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

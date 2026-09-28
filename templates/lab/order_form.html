@@ -1,0 +1,64 @@
+{% extends 'dashboard_base.html' %}
+
+{% block title %}{{ title }} — {{ CLINIC.NAME }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <a href="{% url 'lab_order_list' %}" class="small text-muted text-decoration-none"><i class="bi bi-arrow-left"></i> Back to Lab Orders</a>
+    <h3 class="fw-bold mb-0 mt-1">{{ title }}</h3>
+  </div>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-lg-9">
+    <div class="card card-custom p-4 p-md-5">
+      <form method="POST">
+        {% csrf_token %}
+        <h5 class="fw-bold text-primary mb-3 pb-2 border-bottom">Patient & Doctor Selection</h5>
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Select Patient *</label>
+            {{ form.patient }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Referring Doctor (Optional)</label>
+            {{ form.doctor }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Order Priority</label>
+            {{ form.priority }}
+          </div>
+          <div class="col-12">
+            <label class="form-label small fw-semibold">Clinical Instructions / Fasting Notes</label>
+            {{ form.notes }}
+          </div>
+        </div>
+
+        <h5 class="fw-bold text-primary mb-3 pb-2 border-bottom">Select Diagnostic Tests to Conduct *</h5>
+        <div class="p-3 border rounded-3 bg-light mb-4" style="max-height: 380px; overflow-y: auto;">
+          <div class="row g-2">
+            {% for checkbox in form.tests %}
+              <div class="col-md-6">
+                <div class="form-check p-2 bg-white rounded border">
+                  {{ checkbox.tag }}
+                  <label class="form-check-label small fw-semibold ms-1" for="{{ checkbox.id_for_label }}">
+                    {{ checkbox.choice_label }}
+                  </label>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary-custom px-4">
+            <i class="bi bi-droplet-half me-1"></i> Generate Lab Order
+          </button>
+          <a href="{% url 'lab_order_list' %}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

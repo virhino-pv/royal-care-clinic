@@ -1,0 +1,123 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Doctor Prescription — {{ prescription.appointment.patient.full_name }}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #1e293b; }
+    .rx-header { border-bottom: 2px solid #0d3b66; padding-bottom: 12px; margin-bottom: 20px; }
+    .patient-strip { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px 14px; margin-bottom: 20px; }
+    .rx-symbol { font-family: 'Georgia', serif; font-size: 2.2rem; font-weight: bold; color: #0d3b66; line-height: 1; margin-bottom: 10px; }
+    @media print {
+      .no-print { display: none !important; }
+      body { margin: 0; padding: 15px; }
+    }
+  </style>
+</head>
+<body class="p-4">
+
+  <div class="no-print text-end mb-3">
+    <button onclick="window.print()" class="btn btn-primary btn-sm"><i class="bi bi-printer me-1"></i> Print / Save PDF</button>
+    <button onclick="window.close()" class="btn btn-secondary btn-sm">Close Window</button>
+  </div>
+
+  <div class="container" style="max-width: 850px;">
+    <!-- Clinic & Doctor Letterhead -->
+    <div class="rx-header d-flex justify-content-between align-items-center">
+      <div>
+        <h2 class="fw-bold text-primary mb-0">{{ CLINIC.NAME }}</h2>
+        <div class="text-secondary fw-semibold small">CLINICAL OPD & DIAGNOSTIC LABORATORY</div>
+        <div class="text-muted small">{{ CLINIC.ADDRESS }}</div>
+        <div class="text-muted small">Ph: {{ CLINIC.PHONE }} | {{ CLINIC.LANDLINE }}</div>
+      </div>
+      <div class="text-end">
+        <h4 class="fw-bold text-dark mb-0">{{ prescription.appointment.doctor.doctor_name }}</h4>
+        <div class="text-primary fw-semibold small">{{ prescription.appointment.doctor.qualification }}</div>
+        <div class="text-muted small">{{ prescription.appointment.doctor.specialization }}</div>
+        <div class="badge bg-light text-dark border mt-1">Room: {{ prescription.appointment.doctor.room_number }}</div>
+      </div>
+    </div>
+
+    <!-- Patient Details -->
+    <div class="patient-strip">
+      <div class="row g-2 small">
+        <div class="col-6">
+          <div>Patient: <strong class="text-dark">{{ prescription.appointment.patient.full_name }}</strong></div>
+          <div>Age / Gender: <strong>{{ prescription.appointment.patient.age }} Yrs / {{ prescription.appointment.patient.get_gender_display }}</strong></div>
+          <div>Phone: <strong>{{ prescription.appointment.patient.phone }}</strong></div>
+        </div>
+        <div class="col-6 text-end">
+          <div>Date: <strong>{{ prescription.created_at|date:"d M Y" }}</strong></div>
+          <div>BP: <strong>{{ prescription.blood_pressure|default:"—" }}</strong> | Pulse: <strong>{{ prescription.pulse_rate|default:"—" }}</strong></div>
+          <div>Weight: <strong>{{ prescription.weight_kg|default:"—" }} kg</strong> | Temp: <strong>{{ prescription.temperature|default:"—" }}</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Diagnosis -->
+    <div class="mb-4">
+      <div class="small fw-bold text-muted text-uppercase">Primary Diagnosis:</div>
+      <div class="fs-5 fw-bold text-primary">{{ prescription.diagnosis }}</div>
+      {% if prescription.chief_complaints %}
+        <div class="small text-muted mt-1">Complaints: {{ prescription.chief_complaints }}</div>
+      {% endif %}
+    </div>
+
+    <!-- Rx Section -->
+    <div class="rx-symbol">℞</div>
+
+    <table class="table table-bordered align-middle small mb-4">
+      <thead class="table-light">
+        <tr>
+          <th>#</th>
+          <th>Medicine / Brand & Strength</th>
+          <th>Dosage</th>
+          <th>Frequency Schedule</th>
+          <th>Duration</th>
+          <th>Instructions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for med in prescription.medicines.all %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td class="fw-bold text-dark">{{ med.medicine_name }}</td>
+            <td>{{ med.dosage }}</td>
+            <td>{{ med.frequency }}</td>
+            <td>{{ med.duration_days }} Days</td>
+            <td>{{ med.instructions|default:"After food" }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if prescription.advice_diet %}
+      <div class="p-3 border rounded bg-light small mb-3">
+        <strong>General Advice / Dietary Guidelines:</strong>
+        <p class="mb-0 text-muted mt-1">{{ prescription.advice_diet }}</p>
+      </div>
+    {% endif %}
+
+    {% if prescription.follow_up_date %}
+      <div class="p-2 border rounded bg-light small mb-4 text-primary fw-bold">
+        <i class="bi bi-calendar-event me-1"></i> Next Follow-Up Review: {{ prescription.follow_up_date }}
+      </div>
+    {% endif %}
+
+    <!-- Footer Sign -->
+    <div class="d-flex justify-content-between align-items-end pt-5 mt-4 border-top">
+      <div class="small text-muted">
+        <div>Emergency Call: {{ CLINIC.PHONE }}</div>
+        <div style="font-size: 0.72rem;">Digital Prescription Powered by Virhino.com</div>
+      </div>
+      <div class="text-center" style="min-width: 200px;">
+        <div class="fw-bold text-dark mb-1">{{ prescription.appointment.doctor.doctor_name }}</div>
+        <div class="small text-muted border-top pt-1">Doctor Signature / Registration Seal</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

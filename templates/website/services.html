@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}Medical Services — {{ CLINIC.NAME }}{% endblock %}
+
+{% block content %}
+<div class="bg-primary text-white py-5">
+  <div class="container">
+    <h1 class="fw-bold mb-2">Medical Specialties & Outpatient Services</h1>
+    <p class="text-white-50 mb-0">Comprehensive clinical consultations across general and specialized medical departments.</p>
+  </div>
+</div>
+
+<div class="container py-5">
+  <div class="row g-4">
+    <div class="col-lg-4 col-md-6">
+      <div class="card card-custom h-100 p-4">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-3">
+            <i class="bi bi-heart-pulse fs-3"></i>
+          </div>
+          <div>
+            <h5 class="fw-bold mb-0">General Medicine</h5>
+            <small class="text-primary fw-semibold">Internal Medicine OPD</small>
+          </div>
+        </div>
+        <p class="text-muted small">Treatment of acute fevers, viral infections, cough, respiratory issues, hypertension, gastric disorders, and preventive health checks.</p>
+        <div class="mt-auto pt-3 border-top">
+          <a href="{% url 'book_appointment' %}" class="btn btn-sm btn-outline-primary w-100">Book General OPD</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6">
+      <div class="card card-custom h-100 p-4">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="bg-danger bg-opacity-10 text-danger p-3 rounded-3">
+            <i class="bi bi-activity fs-3"></i>
+          </div>
+          <div>
+            <h5 class="fw-bold mb-0">Cardiology & Heart Care</h5>
+            <small class="text-danger fw-semibold">ECG & Cardiac Screening</small>
+          </div>
+        </div>
+        <p class="text-muted small">Blood pressure monitoring, 12-lead ECG, lipid profile assessment, cardiovascular risk screening, and post-angioplasty routine reviews.</p>
+        <div class="mt-auto pt-3 border-top">
+          <a href="{% url 'book_appointment' %}" class="btn btn-sm btn-outline-primary w-100">Consult Cardiologist</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6">
+      <div class="card card-custom h-100 p-4">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="bg-warning bg-opacity-10 text-warning p-3 rounded-3">
+            <i class="bi bi-droplet-half fs-3"></i>
+          </div>
+          <div>
+            <h5 class="fw-bold mb-0">Diabetology & Endocrine</h5>
+            <small class="text-warning fw-semibold">Diabetes Care & HbA1c</small>
+          </div>
+        </div>
+        <p class="text-muted small">Comprehensive glycemic control, insulin management, diabetic diet counseling, neuropathy screening, and thyroid management.</p>
+        <div class="mt-auto pt-3 border-top">
+          <a href="{% url 'book_appointment' %}" class="btn btn-sm btn-outline-primary w-100">Book Diabetes Consultation</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6">
+      <div class="card card-custom h-100 p-4">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="bg-success bg-opacity-10 text-success p-3 rounded-3">
+            <i class="bi bi-person-heart fs-3"></i>
+          </div>
+          <div>
+            <h5 class="fw-bold mb-0">Pediatrics & Child Care</h5>
+            <small class="text-success fw-semibold">Infant & Child Health</small>
+          </div>
+        </div>
+        <p class="text-muted small">Childhood vaccinations, growth & developmental milestone tracking, pediatric infections, pediatric nutrition, and seasonal flu management.</p>
+        <div class="mt-auto pt-3 border-top">
+          <a href="{% url 'book_appointment' %}" class="btn btn-sm btn-outline-primary w-100">Consult Pediatrician</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6">
+      <div class="card card-custom h-100 p-4">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="bg-info bg-opacity-10 text-info p-3 rounded-3">
+            <i class="bi bi-gender-female fs-3"></i>
+          </div>
+          <div>
+            <h5 class="fw-bold mb-0">Obstetrics & Gynecology</h5>
+            <small class="text-info fw-semibold">Women's Health</small>
+          </div>
+        </div>
+        <p class="text-muted small">Antenatal checkups, post-natal guidance, PCOD/PCOS management, menstrual disorders, pelvic screening, and menopause counseling.</p>
+        <div class="mt-auto pt-3 border-top">
+          <a href="{% url 'book_appointment' %}" class="btn btn-sm btn-outline-primary w-100">Consult Gynecologist</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6">
+      <div class="card card-custom h-100 p-4">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="bg-secondary bg-opacity-10 text-secondary p-3 rounded-3">
+            <i class="bi bi-bandaid fs-3"></i>
+          </div>
+          <div>
+            <h5 class="fw-bold mb-0">Dermatology & Skin</h5>
+            <small class="text-secondary fw-semibold">Skin, Hair & Nails</small>
+          </div>
+        </div>
+        <p class="text-muted small">Diagnosis and treatment of acne, eczema, fungal infections, psoriasis, allergic dermatitis, hair fall, and general aesthetic skin care.</p>
+        <div class="mt-auto pt-3 border-top">
+          <a href="{% url 'book_appointment' %}" class="btn btn-sm btn-outline-primary w-100">Consult Dermatologist</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,241 @@
+{% extends 'dashboard_base.html' %}
+{% load humanize %}
+
+{% block title %}Patient File — {{ patient.full_name }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+  <div>
+    <a href="{% url 'patient_list' %}" class="small text-muted text-decoration-none"><i class="bi bi-arrow-left"></i> Back to Directory</a>
+    <h3 class="fw-bold mb-0 mt-1">{{ patient.full_name }}</h3>
+    <span class="text-muted small">Registered on {{ patient.created_at|date:"d M Y, h:i A" }} • Patient ID #{{ patient.pk }}</span>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'appointment_create' %}?patient_id={{ patient.pk }}" class="btn btn-primary-custom btn-sm">
+      <i class="bi bi-calendar-plus-fill me-1"></i> Book Appointment
+    </a>
+    <a href="{% url 'lab_order_create' %}?patient_id={{ patient.pk }}" class="btn btn-secondary-custom btn-sm">
+      <i class="bi bi-droplet-fill me-1"></i> Create Lab Order
+    </a>
+    <a href="{% url 'patient_edit' patient.pk %}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-pencil-fill me-1"></i> Edit
+    </a>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Patient Profile Summary Card -->
+  <div class="col-lg-4">
+    <div class="card card-custom p-4 mb-4">
+      <div class="text-center mb-3">
+        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center fw-bold fs-2 mb-2" style="width: 72px; height: 72px;">
+          {{ patient.first_name|first }}{{ patient.last_name|first }}
+        </div>
+        <h5 class="fw-bold mb-0">{{ patient.full_name }}</h5>
+        <span class="badge bg-secondary bg-opacity-10 text-dark">{{ patient.get_gender_display }} • {{ patient.age }} yrs</span>
+      </div>
+
+      <hr>
+
+      <div class="d-flex flex-column gap-2 small">
+        <div class="d-flex justify-content-between">
+          <span class="text-muted">Mobile:</span>
+          <span class="fw-bold">{{ patient.phone }}</span>
+        </div>
+        <div class="d-flex justify-content-between">
+          <span class="text-muted">Email:</span>
+          <span>{{ patient.email|default:"Not provided" }}</span>
+        </div>
+        <div class="d-flex justify-content-between">
+          <span class="text-muted">Blood Group:</span>
+          <span class="badge bg-danger bg-opacity-10 text-danger fw-bold">{{ patient.blood_group }}</span>
+        </div>
+        <div class="d-flex justify-content-between">
+          <span class="text-muted">DOB:</span>
+          <span>{{ patient.date_of_birth|default:"Not recorded" }}</span>
+        </div>
+        <div class="d-flex justify-content-between">
+          <span class="text-muted">Emergency Contact:</span>
+          <span>{{ patient.emergency_contact|default:"None listed" }}</span>
+        </div>
+        <div class="d-flex justify-content-between">
+          <span class="text-muted">Address:</span>
+          <span class="text-end">{{ patient.address|default:"Chennai" }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Medical History & Alerts -->
+    <div class="card card-custom p-4">
+      <h6 class="fw-bold text-danger mb-2"><i class="bi bi-exclamation-triangle-fill me-1"></i> Allergies & Clinical Alerts</h6>
+      <p class="small text-muted mb-3">{{ patient.allergies|default:"No known drug/food allergies recorded." }}</p>
+
+      <h6 class="fw-bold text-primary mb-2"><i class="bi bi-file-medical-fill me-1"></i> Chronic Medical History</h6>
+      <p class="small text-muted mb-0">{{ patient.medical_history|default:"No past surgical or chronic conditions documented." }}</p>
+    </div>
+  </div>
+
+  <!-- Appointments, Lab Orders & Billing Tabs -->
+  <div class="col-lg-8">
+    <div class="card card-custom p-4 mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold text-dark mb-0"><i class="bi bi-calendar-event me-2 text-primary"></i>Appointment History ({{ appointments.count }})</h5>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 small">
+          <thead class="table-light">
+            <tr>
+              <th>Date & Time</th>
+              <th>Doctor</th>
+              <th>Type / Reason</th>
+              <th>Status</th>
+              <th>Rx</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for appt in appointments %}
+              <tr>
+                <td>
+                  <div class="fw-bold">{{ appt.appointment_date }}</div>
+                  <div class="text-muted">{{ appt.appointment_time|time:"h:i A" }}</div>
+                </td>
+                <td>{{ appt.doctor.doctor_name }}</td>
+                <td>
+                  <div>{{ appt.get_appointment_type_display }}</div>
+                  <small class="text-muted">{{ appt.reason|truncatewords:4 }}</small>
+                </td>
+                <td>
+                  <span class="badge badge-status badge-{{ appt.status }}">{{ appt.get_status_display }}</span>
+                </td>
+                <td>
+                  {% if appt.prescription %}
+                    <a href="{% url 'prescription_detail' appt.prescription.pk %}" class="badge bg-success text-decoration-none">
+                      <i class="bi bi-prescription2"></i> View Rx
+                    </a>
+                  {% else %}
+                    <span class="text-muted">—</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <a href="{% url 'appointment_detail' appt.pk %}" class="btn btn-sm btn-outline-primary py-0 px-2">Open</a>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="6" class="text-center text-muted py-3">No appointment records for this patient.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Diagnostic Lab Orders Card -->
+    <div class="card card-custom p-4 mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold text-dark mb-0"><i class="bi bi-droplet-half me-2 text-warning"></i>Diagnostic Lab Orders ({{ lab_orders.count }})</h5>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 small">
+          <thead class="table-light">
+            <tr>
+              <th>Order Ref</th>
+              <th>Order Date</th>
+              <th>Tests Conducted</th>
+              <th>Status</th>
+              <th>Amount</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order in lab_orders %}
+              <tr>
+                <td>
+                  <a href="{% url 'lab_order_detail' order.pk %}" class="fw-bold text-primary text-decoration-none">
+                    {{ order.order_number }}
+                  </a>
+                </td>
+                <td>{{ order.order_date }}</td>
+                <td>
+                  {% for item in order.items.all %}
+                    <span class="badge bg-light text-dark border">{{ item.test.code }}</span>
+                  {% endfor %}
+                </td>
+                <td>
+                  <span class="badge bg-secondary bg-opacity-25 text-dark">{{ order.get_status_display }}</span>
+                </td>
+                <td class="fw-bold">₹{{ order.total_amount|floatformat:0 }}</td>
+                <td>
+                  <a href="{% url 'lab_order_detail' order.pk %}" class="btn btn-sm btn-outline-secondary py-0 px-2">View</a>
+                  {% if order.status == 'completed' %}
+                    <a href="{% url 'lab_report_print' order.pk %}" target="_blank" class="btn btn-sm btn-outline-primary py-0 px-2" title="Print Report">
+                      <i class="bi bi-printer"></i>
+                    </a>
+                  {% endif %}
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="6" class="text-center text-muted py-3">No diagnostic lab orders for this patient.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Invoices Card -->
+    <div class="card card-custom p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold text-dark mb-0"><i class="bi bi-receipt me-2 text-success"></i>Billing History ({{ invoices.count }})</h5>
+        <a href="{% url 'invoice_create' %}?patient_id={{ patient.pk }}" class="btn btn-sm btn-outline-success">
+          <i class="bi bi-plus-circle me-1"></i> New Invoice
+        </a>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 small">
+          <thead class="table-light">
+            <tr>
+              <th>Invoice No</th>
+              <th>Date</th>
+              <th>Total Billed</th>
+              <th>Paid Amount</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for inv in invoices %}
+              <tr>
+                <td>
+                  <a href="{% url 'invoice_detail' inv.pk %}" class="fw-bold text-primary text-decoration-none">
+                    {{ inv.invoice_number }}
+                  </a>
+                </td>
+                <td>{{ inv.created_at|date:"d M Y" }}</td>
+                <td class="fw-bold">₹{{ inv.total_amount|floatformat:0 }}</td>
+                <td class="text-success fw-bold">₹{{ inv.paid_amount|floatformat:0 }}</td>
+                <td>
+                  <span class="badge badge-{{ inv.payment_status }}">{{ inv.get_payment_status_display }}</span>
+                </td>
+                <td>
+                  <a href="{% url 'invoice_detail' inv.pk %}" class="btn btn-sm btn-outline-primary py-0 px-2">Open</a>
+                  <a href="{% url 'invoice_print' inv.pk %}" target="_blank" class="btn btn-sm btn-outline-secondary py-0 px-2"><i class="bi bi-printer"></i></a>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="6" class="text-center text-muted py-3">No invoices logged.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

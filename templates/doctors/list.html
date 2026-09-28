@@ -1,0 +1,77 @@
+{% extends 'dashboard_base.html' %}
+
+{% block title %}Doctors & Duty Schedule — {{ CLINIC.NAME }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+  <div>
+    <h3 class="fw-bold mb-1">Doctor Profiles & Consulting Roster</h3>
+    <p class="text-muted small mb-0">Manage doctor specialties, consultation charges, consulting rooms, and active timings.</p>
+  </div>
+  {% if user.is_admin or user.is_superuser %}
+    <div>
+      <a href="{% url 'doctor_create' %}" class="btn btn-primary-custom">
+        <i class="bi bi-person-plus-fill me-1"></i> Add Doctor Profile
+      </a>
+    </div>
+  {% endif %}
+</div>
+
+<div class="row g-4">
+  {% for doc in doctors %}
+    <div class="col-lg-6">
+      <div class="card card-custom h-100 p-4">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <div class="d-flex align-items-center gap-3">
+            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold fs-4" style="width: 56px; height: 56px;">
+              Dr
+            </div>
+            <div>
+              <h5 class="fw-bold mb-0">
+                <a href="{% url 'doctor_detail' doc.pk %}" class="text-decoration-none text-dark">
+                  {{ doc.doctor_name }}
+                </a>
+              </h5>
+              <span class="text-primary fw-semibold small">{{ doc.specialization }}</span>
+            </div>
+          </div>
+          <span class="badge {% if doc.is_available %}bg-success{% else %}bg-danger{% endif %} bg-opacity-10 {% if doc.is_available %}text-success{% else %}text-danger{% endif %}">
+            {% if doc.is_available %}Active{% else %}Inactive{% endif %}
+          </span>
+        </div>
+
+        <div class="text-muted small mb-3">
+          <div><i class="bi bi-mortarboard me-1"></i> {{ doc.qualification }} ({{ doc.experience_years }} yrs exp)</div>
+          <div><i class="bi bi-door-open me-1"></i> Consulting Room: <strong>{{ doc.room_number }}</strong></div>
+          <div><i class="bi bi-calendar-week me-1"></i> Days: {{ doc.available_days }}</div>
+          <div><i class="bi bi-clock me-1"></i> Hours: {{ doc.start_time|time:"h:i A" }} - {{ doc.end_time|time:"h:i A" }} ({{ doc.slot_duration_minutes }} min slots)</div>
+        </div>
+
+        <div class="pt-3 border-top d-flex justify-content-between align-items-center mt-auto">
+          <div>
+            <span class="text-muted small">Consultation Fee:</span>
+            <div class="fw-bold fs-5 text-primary">₹{{ doc.consultation_fee|floatformat:0 }}</div>
+          </div>
+          <div class="d-flex gap-2">
+            <a href="{% url 'appointment_create' %}?doctor={{ doc.id }}" class="btn btn-sm btn-primary-custom">
+              <i class="bi bi-calendar-plus me-1"></i> Book
+            </a>
+            <a href="{% url 'doctor_detail' doc.pk %}" class="btn btn-sm btn-outline-secondary">
+              View
+            </a>
+            {% if user.is_admin or user.is_superuser %}
+              <a href="{% url 'doctor_edit' doc.pk %}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-pencil"></i>
+              </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <div class="col-12 text-center text-muted py-5">
+      No doctors configured yet.
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

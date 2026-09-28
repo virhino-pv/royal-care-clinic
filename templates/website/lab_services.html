@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Diagnostic Lab Services — {{ CLINIC.NAME }}{% endblock %}
+
+{% block content %}
+<div class="bg-primary text-white py-5">
+  <div class="container">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+      <div>
+        <h1 class="fw-bold mb-2">Diagnostic Laboratory Test Directory</h1>
+        <p class="text-white-50 mb-0">High-precision clinical testing with calibrated automated analyzers.</p>
+      </div>
+      <div>
+        <a href="{% url 'book_lab_test' %}" class="btn btn-secondary-custom">
+          <i class="bi bi-cart-plus me-1"></i> Book Diagnostic Test Online
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container py-5">
+  <!-- Key Lab Highlights Banner -->
+  <div class="row g-3 mb-5">
+    <div class="col-md-3">
+      <div class="p-3 bg-white border rounded-3 d-flex align-items-center gap-3 shadow-sm">
+        <i class="bi bi-shield-check text-primary fs-2"></i>
+        <div>
+          <div class="fw-bold text-dark">NABL/NABH Ready</div>
+          <small class="text-muted">Strict standard operating procedures</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="p-3 bg-white border rounded-3 d-flex align-items-center gap-3 shadow-sm">
+        <i class="bi bi-whatsapp text-success fs-2"></i>
+        <div>
+          <div class="fw-bold text-dark">WhatsApp Reports</div>
+          <small class="text-muted">Instant PDF delivery to your phone</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="p-3 bg-white border rounded-3 d-flex align-items-center gap-3 shadow-sm">
+        <i class="bi bi-house-door text-info fs-2"></i>
+        <div>
+          <div class="fw-bold text-dark">Home Sample Pickup</div>
+          <small class="text-muted">Available across Aminjikarai & vicinity</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="p-3 bg-white border rounded-3 d-flex align-items-center gap-3 shadow-sm">
+        <i class="bi bi-tag text-warning fs-2"></i>
+        <div>
+          <div class="fw-bold text-dark">Transparent Rates</div>
+          <small class="text-muted">Direct affordable diagnostic pricing</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Test Category Tabs & Listings -->
+  {% for cat in categories %}
+    <div class="mb-5">
+      <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
+        <i class="bi {{ cat.icon }} text-primary fs-4"></i>
+        <h4 class="fw-bold text-dark mb-0">{{ cat.name }}</h4>
+        <span class="badge bg-light text-muted border ms-2">{{ cat.tests.count }} Tests</span>
+      </div>
+
+      <div class="row g-3">
+        {% for test in cat.tests.all %}
+          <div class="col-lg-4 col-md-6">
+            <div class="card card-custom h-100 p-3 d-flex flex-column justify-content-between">
+              <div>
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="badge bg-primary bg-opacity-10 text-primary fw-bold">{{ test.code }}</span>
+                  <span class="small text-muted"><i class="bi bi-clock me-1"></i>{{ test.turnaround_hours }} Hours</span>
+                </div>
+                <h6 class="fw-bold text-dark mb-1">{{ test.name }}</h6>
+                <div class="text-muted small mb-2">Specimen: <strong class="text-dark">{{ test.sample_type }}</strong></div>
+                {% if test.normal_range %}
+                  <div class="p-2 bg-light rounded text-muted small mb-2">
+                    Ref Range: <span class="fw-semibold text-dark">{{ test.normal_range }} {{ test.unit }}</span>
+                  </div>
+                {% endif %}
+                {% if test.description %}
+                  <p class="small text-muted mb-2">{{ test.description }}</p>
+                {% endif %}
+              </div>
+              <div class="pt-2 border-top d-flex justify-content-between align-items-center">
+                <span class="fw-bold text-primary fs-5">₹{{ test.price|floatformat:0 }}</span>
+                <a href="{% url 'book_lab_test' %}?test={{ test.id }}" class="btn btn-sm btn-primary-custom">
+                  Book Test
+                </a>
+              </div>
+            </div>
+          </div>
+        {% empty %}
+          <div class="col-12 text-muted small">No tests listed under this category currently.</div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

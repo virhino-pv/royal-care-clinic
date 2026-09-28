@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}About Us — {{ CLINIC.NAME }}{% endblock %}
+
+{% block content %}
+<div class="bg-primary text-white py-5">
+  <div class="container">
+    <h1 class="fw-bold mb-2">About Royal Care Clinic & Lab</h1>
+    <p class="text-white-50 mb-0">Committed to clinical excellence, patient trust, and diagnostic accuracy in Chennai.</p>
+  </div>
+</div>
+
+<div class="container py-5">
+  <div class="row g-5 align-items-center mb-5">
+    <div class="col-lg-6">
+      <h3 class="fw-bold text-primary mb-3">Our Mission & Patient Care Standard</h3>
+      <p class="text-muted">
+        Founded with the vision of providing accessible, reliable, and holistic healthcare to families in and around Aminjikarai, Chennai, {{ CLINIC.NAME }} bridges the gap between expert outpatient medical consultations and rapid diagnostic testing.
+      </p>
+      <p class="text-muted">
+        We believe that effective clinical treatment begins with accurate diagnostic data. By housing both general/specialist physicians and fully equipped pathology analyzers under one roof, we eliminate delays in clinical diagnosis, reduce repeat visits, and ensure tailored treatment plans.
+      </p>
+      <div class="p-3 bg-light rounded-3 border-start border-primary border-4 mb-4">
+        <div class="fw-bold text-dark">Client Location:</div>
+        <div class="text-muted">{{ CLINIC.ADDRESS }}</div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="row g-3">
+        <div class="col-6">
+          <div class="stat-card">
+            <div class="stat-icon-wrapper bg-primary bg-opacity-10 text-primary">
+              <i class="bi bi-people"></i>
+            </div>
+            <div>
+              <div class="stat-value">{{ doctors_count }}</div>
+              <div class="stat-label">Specialist Doctors</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="stat-card">
+            <div class="stat-icon-wrapper bg-secondary bg-opacity-10 text-secondary">
+              <i class="bi bi-droplet"></i>
+            </div>
+            <div>
+              <div class="stat-value">{{ tests_count }}</div>
+              <div class="stat-label">Active Lab Tests</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="stat-card">
+            <div class="stat-icon-wrapper bg-success bg-opacity-10 text-success">
+              <i class="bi bi-clock"></i>
+            </div>
+            <div>
+              <div class="stat-value">7:30 AM</div>
+              <div class="stat-label">Early Sample Pickup</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="stat-card">
+            <div class="stat-icon-wrapper bg-warning bg-opacity-10 text-warning">
+              <i class="bi bi-shield-check"></i>
+            </div>
+            <div>
+              <div class="stat-value">100%</div>
+              <div class="stat-label">Quality Assured</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 py-4">
+    <div class="col-md-4">
+      <div class="card h-100 card-custom p-4 text-center">
+        <div class="mx-auto mb-3 bg-primary bg-opacity-10 text-primary p-3 rounded-circle" style="width: 70px; height: 70px;">
+          <i class="bi bi-award fs-2"></i>
+        </div>
+        <h5 class="fw-bold">Clinical Precision</h5>
+        <p class="text-muted small">Evidence-based treatment protocols guided by certified doctors and medical specialists.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card h-100 card-custom p-4 text-center">
+        <div class="mx-auto mb-3 bg-secondary bg-opacity-10 text-secondary p-3 rounded-circle" style="width: 70px; height: 70px;">
+          <i class="bi bi-speedometer2 fs-2"></i>
+        </div>
+        <h5 class="fw-bold">Rapid Lab Reports</h5>
+        <p class="text-muted small">Automated lab machinery with digital calibration for fastest report delivery via WhatsApp and SMS.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card h-100 card-custom p-4 text-center">
+        <div class="mx-auto mb-3 bg-info bg-opacity-10 text-info p-3 rounded-circle" style="width: 70px; height: 70px;">
+          <i class="bi bi-laptop fs-2"></i>
+        </div>
+        <h5 class="fw-bold">{{ CLINIC.BRAND }}</h5>
+        <p class="text-muted small">Digitized records, queue management, electronic prescriptions, and business analytics.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

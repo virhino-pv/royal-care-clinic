@@ -1,0 +1,180 @@
+{% extends 'dashboard_base.html' %}
+{% load humanize %}
+
+{% block title %}Invoice #{{ invoice.invoice_number }} — {{ CLINIC.NAME }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+  <div>
+    <a href="{% url 'invoice_list' %}" class="small text-muted text-decoration-none"><i class="bi bi-arrow-left"></i> Back to Invoices</a>
+    <h3 class="fw-bold mb-0 mt-1">Invoice #{{ invoice.invoice_number }}</h3>
+    <span class="text-muted small">Generated on {{ invoice.created_at|date:"d M Y, h:i A" }}</span>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'invoice_print' invoice.pk %}" target="_blank" class="btn btn-primary-custom btn-sm">
+      <i class="bi bi-printer-fill me-1"></i> Print / Download Receipt
+    </a>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Invoice Breakdown Card -->
+  <div class="col-lg-7">
+    <div class="card card-custom p-4">
+      <div class="d-flex justify-content-between align-items-start mb-4 pb-3 border-bottom">
+        <div>
+          <h5 class="fw-bold text-primary mb-1">{{ CLINIC.NAME }}</h5>
+          <div class="text-muted small">{{ CLINIC.ADDRESS }}</div>
+        </div>
+        <div class="text-end">
+          <span class="badge badge-{{ invoice.payment_status }} fs-6">{{ invoice.get_payment_status_display }}</span>
+          <div class="small text-muted mt-1">Method: {{ invoice.get_payment_method_display }}</div>
+        </div>
+      </div>
+
+      <div class="p-3 bg-light rounded-3 mb-4">
+        <div class="row g-2 small">
+          <div class="col-6">
+            <span class="text-muted">Billed To:</span>
+            <div class="fw-bold fs-6 text-dark">{{ invoice.patient.full_name }}</div>
+            <div class="text-muted">Phone: {{ invoice.patient.phone }}</div>
+          </div>
+          <div class="col-6 text-end">
+            <span class="text-muted">Invoice Ref:</span>
+            <div class="fw-bold text-dark">{{ invoice.invoice_number }}</div>
+            {% if invoice.appointment %}
+              <div class="text-muted">Appt #{{ invoice.appointment.id }} ({{ invoice.appointment.doctor.doctor_name }})</div>
+            {% elif invoice.lab_order %}
+              <div class="text-muted">Lab Order #{{ invoice.lab_order.order_number }}</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Itemized Breakdown Table -->
+      <table class="table table-bordered align-middle small mb-4">
+        <thead class="table-light">
+          <tr>
+            <th>Item Description</th>
+            <th class="text-end" style="width: 25%;">Amount (₹)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if invoice.consultation_charges > 0 %}
+            <tr>
+              <td>
+                <div class="fw-bold">Doctor Consultation Fee</div>
+                {% if invoice.appointment %}<small class="text-muted">{{ invoice.appointment.doctor.doctor_name }} ({{ invoice.appointment.doctor.specialization }})</small>{% endif %}
+              </td>
+              <td class="text-end fw-semibold">₹{{ invoice.consultation_charges|floatformat:2 }}</td>
+            </tr>
+          {% endif %}
+
+          {% if invoice.lab_charges > 0 %}
+            <tr>
+              <td>
+                <div class="fw-bold">Diagnostic Laboratory Investigations</div>
+                {% if invoice.lab_order %}
+                  <small class="text-muted">
+                    {% for itm in invoice.lab_order.items.all %}{{ itm.test.code }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                  </small>
+                {% endif %}
+              </td>
+              <td class="text-end fw-semibold">₹{{ invoice.lab_charges|floatformat:2 }}</td>
+            </tr>
+          {% endif %}
+
+          {% if invoice.medicine_charges > 0 %}
+            <tr>
+              <td><div class="fw-bold">Pharmacy & Medicines</div></td>
+              <td class="text-end fw-semibold">₹{{ invoice.medicine_charges|floatformat:2 }}</td>
+            </tr>
+          {% endif %}
+
+          {% if invoice.other_charges > 0 %}
+            <tr>
+              <td><div class="fw-bold">Procedure / Nursing / Other Charges</div></td>
+              <td class="text-end fw-semibold">₹{{ invoice.other_charges|floatformat:2 }}</td>
+            </tr>
+          {% endif %}
+
+          {% if invoice.discount_amount > 0 %}
+            <tr class="table-light text-danger">
+              <td>Special Discount Applied</td>
+              <td class="text-end fw-semibold">- ₹{{ invoice.discount_amount|floatformat:2 }}</td>
+            </tr>
+          {% endif %}
+
+          <tr class="table-light">
+            <td class="fw-bold text-end">Grand Total:</td>
+            <td class="text-end fw-bold fs-6 text-primary">₹{{ invoice.total_amount|floatformat:2 }}</td>
+          </tr>
+          <tr class="table-light">
+            <td class="fw-bold text-end text-success">Total Amount Paid:</td>
+            <td class="text-end fw-bold text-success">₹{{ invoice.paid_amount|floatformat:2 }}</td>
+          </tr>
+          {% if invoice.balance_due > 0 %}
+            <tr class="table-warning">
+              <td class="fw-bold text-end text-danger">Outstanding Balance Due:</td>
+              <td class="text-end fw-bold text-danger fs-6">₹{{ invoice.balance_due|floatformat:2 }}</td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+
+      {% if invoice.notes %}
+        <div class="p-2 border rounded bg-light small text-muted">
+          <strong>Remarks:</strong> {{ invoice.notes }}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Collect Payment Box -->
+  <div class="col-lg-5">
+    {% if invoice.balance_due > 0 %}
+      <div class="card card-custom p-4 border-primary">
+        <h5 class="fw-bold text-primary mb-3"><i class="bi bi-credit-card me-2"></i>Collect Outstanding Payment</h5>
+        <div class="alert alert-warning small mb-3">
+          Remaining Balance to Collect: <strong>₹{{ invoice.balance_due|floatformat:2 }}</strong>
+        </div>
+
+        <form action="{% url 'collect_payment' invoice.pk %}" method="POST">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Payment Amount (₹) *</label>
+            {{ payment_form.payment_amount }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Payment Mode *</label>
+            {{ payment_form.payment_method }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Transaction Reference ID (UPI Ref / Card Auth)</label>
+            {{ payment_form.transaction_reference }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Payment Remarks</label>
+            {{ payment_form.remarks }}
+          </div>
+
+          <button type="submit" class="btn btn-success w-100 py-2 fw-bold">
+            <i class="bi bi-cash-stack me-1"></i> Confirm & Record Payment
+          </button>
+        </form>
+      </div>
+    {% else %}
+      <div class="card card-custom p-4 text-center bg-light">
+        <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center p-3 mb-3" style="width: 64px; height: 64px; margin: 0 auto;">
+          <i class="bi bi-check2-circle fs-1"></i>
+        </div>
+        <h5 class="fw-bold text-success mb-1">Invoice Fully Paid</h5>
+        <p class="text-muted small mb-3">Zero balance due. Receipt is ready for patient distribution.</p>
+        <a href="{% url 'invoice_print' invoice.pk %}" target="_blank" class="btn btn-primary-custom w-100">
+          <i class="bi bi-printer me-1"></i> Print Paid Receipt
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

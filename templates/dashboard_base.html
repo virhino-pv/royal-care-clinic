@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar no-print">
+    <div>
+      <div class="sidebar-brand d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-heart-pulse-fill text-info"></i>
+          <span>Staff Portal</span>
+        </div>
+        <span class="badge bg-secondary text-uppercase" style="font-size: 0.65rem;">{{ user.role }}</span>
+      </div>
+
+      <div class="px-3 mb-3 text-white-50 small">
+        <div class="fw-bold text-white">{{ user.get_full_name|default:user.username }}</div>
+        <div style="font-size: 0.75rem;">{{ user.email }}</div>
+      </div>
+
+      <ul class="sidebar-nav">
+        <li>
+          <a href="{% url 'dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+            <i class="bi bi-grid-1x2-fill"></i>
+            <span>Overview</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'patient_list' %}" class="sidebar-link {% if 'patient' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="bi bi-people-fill"></i>
+            <span>Patients</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'appointment_list' %}" class="sidebar-link {% if 'appointment' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="bi bi-calendar-week-fill"></i>
+            <span>Appointments</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'doctor_list' %}" class="sidebar-link {% if 'doctor' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="bi bi-person-badge-fill"></i>
+            <span>Doctors & Schedule</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'lab_dashboard' %}" class="sidebar-link {% if 'lab' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="bi bi-droplet-half"></i>
+            <span>Diagnostic Lab</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'prescription_list' %}" class="sidebar-link {% if 'prescription' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="bi bi-prescription2"></i>
+            <span>Prescriptions</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'invoice_list' %}" class="sidebar-link {% if 'invoice' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="bi bi-receipt"></i>
+            <span>Billing & Cashier</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'analytics_dashboard' %}" class="sidebar-link {% if 'analytics' in request.resolver_match.url_name or 'report' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="bi bi-graph-up-arrow"></i>
+            <span>Analytics & Reports</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="pt-3 border-top border-secondary border-opacity-25">
+      <ul class="sidebar-nav">
+        <li>
+          <a href="{% url 'profile' %}" class="sidebar-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+            <i class="bi bi-person-circle"></i>
+            <span>My Profile</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'home' %}" class="sidebar-link" target="_blank">
+            <i class="bi bi-box-arrow-up-right"></i>
+            <span>Live Website</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'logout' %}" class="sidebar-link text-danger">
+            <i class="bi bi-box-arrow-left"></i>
+            <span>Log Out</span>
+          </a>
+        </li>
+      </ul>
+      <div class="mt-3 px-3 small text-white-50" style="font-size: 0.72rem;">
+        {{ CLINIC.BRAND }}
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+    {% block dashboard_content %}{% endblock %}
+  </main>
+</div>
+{% endblock %}

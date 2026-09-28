@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Our Doctors & Medical Specialists — {{ CLINIC.NAME }}{% endblock %}
+
+{% block content %}
+<div class="bg-primary text-white py-5">
+  <div class="container">
+    <h1 class="fw-bold mb-2">Our Medical Specialists</h1>
+    <p class="text-white-50 mb-0">Experienced physicians providing dedicated outpatient consultations.</p>
+  </div>
+</div>
+
+<div class="container py-5">
+  <div class="row g-4">
+    {% for doc in doctors %}
+      <div class="col-lg-6">
+        <div class="card card-custom h-100 p-4">
+          <div class="d-flex flex-column flex-sm-row gap-4">
+            <div class="bg-primary bg-opacity-10 text-primary rounded-4 d-flex align-items-center justify-content-center fw-bold fs-2 flex-shrink-0" style="width: 100px; height: 100px;">
+              <i class="bi bi-person-badge"></i>
+            </div>
+            <div class="flex-grow-1">
+              <div class="d-flex justify-content-between align-items-start mb-1">
+                <div>
+                  <h4 class="fw-bold text-dark mb-0">{{ doc.doctor_name }}</h4>
+                  <span class="text-primary fw-bold">{{ doc.specialization }}</span>
+                </div>
+                <span class="badge bg-success bg-opacity-10 text-success fw-bold">Available</span>
+              </div>
+
+              <div class="text-muted small mb-2">
+                <div><i class="bi bi-mortarboard-fill me-1"></i> {{ doc.qualification }}</div>
+                <div><i class="bi bi-briefcase-fill me-1"></i> {{ doc.experience_years }} Years Clinical Experience</div>
+                <div><i class="bi bi-door-open-fill me-1"></i> Room: {{ doc.room_number }}</div>
+              </div>
+
+              <div class="p-2 bg-light rounded-3 small text-muted mb-3">
+                <i class="bi bi-clock-fill text-warning me-1"></i> Timings: <strong>{{ doc.start_time|time:"h:i A" }} - {{ doc.end_time|time:"h:i A" }}</strong>
+                <div>Available: {{ doc.available_days }}</div>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                <div>
+                  <span class="text-muted small">Consultation Fee:</span>
+                  <div class="fw-bold fs-5 text-primary">₹{{ doc.consultation_fee|floatformat:0 }}</div>
+                </div>
+                <a href="{% url 'book_appointment' %}?doctor={{ doc.id }}" class="btn btn-primary-custom">
+                  <i class="bi bi-calendar-check me-1"></i> Book Appointment
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12 text-center text-muted py-5">
+        <h5>Doctor profiles are currently updating.</h5>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

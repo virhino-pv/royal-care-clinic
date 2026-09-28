@@ -1,0 +1,98 @@
+{% extends 'dashboard_base.html' %}
+
+{% block title %}{{ title }} — {{ CLINIC.NAME }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <a href="{% url 'doctor_list' %}" class="small text-muted text-decoration-none"><i class="bi bi-arrow-left"></i> Back to Doctor Directory</a>
+    <h3 class="fw-bold mb-0 mt-1">{{ title }}</h3>
+  </div>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card card-custom p-4 p-md-5">
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <h5 class="fw-bold text-primary mb-3 pb-2 border-bottom">Doctor Account & Contact</h5>
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">First Name *</label>
+            {{ form.first_name }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Last Name *</label>
+            {{ form.last_name }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Email Address *</label>
+            {{ form.email }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Phone Number *</label>
+            {{ form.phone }}
+          </div>
+        </div>
+
+        <h5 class="fw-bold text-primary mb-3 pb-2 border-bottom">Professional & OPD Settings</h5>
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Specialization *</label>
+            {{ form.specialization }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Qualification *</label>
+            {{ form.qualification }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label small fw-semibold">Experience (Years)</label>
+            {{ form.experience_years }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label small fw-semibold">Consultation Fee (₹) *</label>
+            {{ form.consultation_fee }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label small fw-semibold">Room Number</label>
+            {{ form.room_number }}
+          </div>
+          <div class="col-12">
+            <label class="form-label small fw-semibold">Available Days (Comma-separated)</label>
+            {{ form.available_days }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label small fw-semibold">Start Time</label>
+            {{ form.start_time }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label small fw-semibold">End Time</label>
+            {{ form.end_time }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label small fw-semibold">Slot Duration (Mins)</label>
+            {{ form.slot_duration_minutes }}
+          </div>
+          <div class="col-12">
+            <div class="form-check form-switch mt-2">
+              {{ form.is_available }}
+              <label class="form-check-label fw-semibold" for="{{ form.is_available.id_for_label }}">Active & Accepting OPD Appointments</label>
+            </div>
+          </div>
+          <div class="col-12">
+            <label class="form-label small fw-semibold">Doctor Bio / Profile</label>
+            {{ form.bio }}
+          </div>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary-custom px-4">
+            <i class="bi bi-check-lg me-1"></i> Save Doctor Profile
+          </button>
+          <a href="{% url 'doctor_list' %}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

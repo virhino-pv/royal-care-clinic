@@ -1,0 +1,95 @@
+{% extends 'dashboard_base.html' %}
+
+{% block title %}Prescription #{{ prescription.id }} — {{ CLINIC.NAME }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+  <div>
+    <a href="{% url 'prescription_list' %}" class="small text-muted text-decoration-none"><i class="bi bi-arrow-left"></i> Back to Prescriptions</a>
+    <h3 class="fw-bold mb-0 mt-1">Prescription Details</h3>
+    <span class="text-muted small">Generated on {{ prescription.created_at|date:"d M Y, h:i A" }}</span>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'prescription_print' prescription.pk %}" target="_blank" class="btn btn-primary-custom btn-sm">
+      <i class="bi bi-printer-fill me-1"></i> Print / Download Rx
+    </a>
+  </div>
+</div>
+
+<div class="card card-custom p-4 p-md-5">
+  <!-- Patient Info Banner -->
+  <div class="p-3 bg-light rounded-3 mb-4">
+    <div class="row g-2 small">
+      <div class="col-md-4">
+        <div>Patient: <strong class="text-dark">{{ prescription.appointment.patient.full_name }}</strong></div>
+        <div>Age / Gender: <strong>{{ prescription.appointment.patient.age }} yrs ({{ prescription.appointment.patient.get_gender_display }})</strong></div>
+        <div>Mobile: <strong>{{ prescription.appointment.patient.phone }}</strong></div>
+      </div>
+      <div class="col-md-4">
+        <div>Doctor: <strong class="text-dark">{{ prescription.appointment.doctor.doctor_name }}</strong></div>
+        <div>Specialty: <strong>{{ prescription.appointment.doctor.specialization }}</strong></div>
+        <div>Room: <strong>{{ prescription.appointment.doctor.room_number }}</strong></div>
+      </div>
+      <div class="col-md-4 text-md-end">
+        <div>BP: <strong>{{ prescription.blood_pressure|default:"—" }}</strong></div>
+        <div>Pulse: <strong>{{ prescription.pulse_rate|default:"—" }}</strong> | Temp: <strong>{{ prescription.temperature|default:"—" }}</strong></div>
+        <div>Weight: <strong>{{ prescription.weight_kg|default:"—" }} kg</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-4">
+    <h5 class="fw-bold text-primary mb-1">Clinical Diagnosis</h5>
+    <p class="fs-6 text-dark fw-semibold mb-3">{{ prescription.diagnosis }}</p>
+    {% if prescription.chief_complaints %}
+      <div class="small text-muted mb-3"><strong>Chief Complaints:</strong> {{ prescription.chief_complaints }}</div>
+    {% endif %}
+  </div>
+
+  <!-- Medicines Table -->
+  <h5 class="fw-bold text-dark mb-3"><i class="bi bi-capsule me-2 text-primary"></i>Prescribed Medications & Dosages</h5>
+  <div class="table-responsive mb-4">
+    <table class="table table-bordered align-middle small">
+      <thead class="table-light">
+        <tr>
+          <th>#</th>
+          <th>Medicine / Brand Name</th>
+          <th>Dosage</th>
+          <th>Frequency Schedule</th>
+          <th>Duration</th>
+          <th>Special Instructions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for med in prescription.medicines.all %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td class="fw-bold text-dark">{{ med.medicine_name }}</td>
+            <td>{{ med.dosage }}</td>
+            <td><span class="badge bg-light text-dark border">{{ med.frequency }}</span></td>
+            <td>{{ med.duration_days }} Days</td>
+            <td>{{ med.instructions|default:"As directed" }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6" class="text-center text-muted py-3">No specific medicines added.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if prescription.advice_diet %}
+    <div class="p-3 bg-light rounded-3 mb-4">
+      <h6 class="fw-bold text-dark small mb-1"><i class="bi bi-info-circle me-1"></i> Lifestyle & Dietary Advice:</h6>
+      <p class="small text-muted mb-0">{{ prescription.advice_diet }}</p>
+    </div>
+  {% endif %}
+
+  {% if prescription.follow_up_date %}
+    <div class="alert alert-warning small mb-0">
+      <i class="bi bi-calendar-event-fill me-1"></i> Next Review / Follow-up Visit Scheduled: <strong>{{ prescription.follow_up_date }}</strong>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,196 @@
+{% extends 'dashboard_base.html' %}
+{% load humanize %}
+
+{% block title %}Dashboard — {{ CLINIC.NAME }}{% endblock %}
+
+{% block dashboard_content %}
+<!-- Dashboard Header -->
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+  <div>
+    <h3 class="fw-bold mb-1">Clinical & Diagnostic Overview</h3>
+    <p class="text-muted small mb-0">
+      Welcome, <strong>{{ user.get_full_name|default:user.username }}</strong> ({{ user.get_role_display }}) • Today is {{ today|date:"l, d F Y" }}
+    </p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'patient_create' %}" class="btn btn-primary-custom btn-sm">
+      <i class="bi bi-person-plus-fill me-1"></i> Register Patient
+    </a>
+    <a href="{% url 'appointment_create' %}" class="btn btn-secondary-custom btn-sm">
+      <i class="bi bi-calendar-plus-fill me-1"></i> New Appointment
+    </a>
+    <a href="{% url 'lab_order_create' %}" class="btn btn-outline-primary btn-sm">
+      <i class="bi bi-droplet-fill me-1"></i> New Lab Order
+    </a>
+  </div>
+</div>
+
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-xl-3 col-sm-6">
+    <div class="stat-card">
+      <div class="stat-icon-wrapper bg-primary bg-opacity-10 text-primary">
+        <i class="bi bi-people-fill"></i>
+      </div>
+      <div>
+        <div class="stat-value">{{ total_patients }}</div>
+        <div class="stat-label">Total Patients</div>
+        <small class="text-success fw-semibold">+{{ new_patients_today }} registered today</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-3 col-sm-6">
+    <div class="stat-card">
+      <div class="stat-icon-wrapper bg-info bg-opacity-10 text-info">
+        <i class="bi bi-calendar2-week-fill"></i>
+      </div>
+      <div>
+        <div class="stat-value">{{ total_today_appointments }}</div>
+        <div class="stat-label">Today's Appointments</div>
+        <small class="text-primary fw-semibold">{{ completed_today }} done / {{ pending_today }} pending</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-3 col-sm-6">
+    <div class="stat-card">
+      <div class="stat-icon-wrapper bg-warning bg-opacity-10 text-warning">
+        <i class="bi bi-droplet-half"></i>
+      </div>
+      <div>
+        <div class="stat-value">{{ total_today_lab }}</div>
+        <div class="stat-label">Today's Lab Orders</div>
+        <small class="text-warning fw-semibold">{{ pending_lab }} in progress / {{ completed_lab }} done</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-3 col-sm-6">
+    <div class="stat-card">
+      <div class="stat-icon-wrapper bg-success bg-opacity-10 text-success">
+        <i class="bi bi-currency-rupee"></i>
+      </div>
+      <div>
+        <div class="stat-value">₹{{ today_revenue|floatformat:0|intcomma }}</div>
+        <div class="stat-label">Today's Revenue</div>
+        <small class="text-success fw-semibold">Consultation & Diagnostics</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Two-Column Queue Table -->
+<div class="row g-4 mb-4">
+  <!-- Today's Appointments Queue -->
+  <div class="col-lg-7">
+    <div class="card card-custom p-4 h-100">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold text-dark mb-0"><i class="bi bi-clock-history me-2 text-primary"></i>Recent Appointments Queue</h5>
+        <a href="{% url 'appointment_list' %}" class="small fw-bold text-decoration-none">View All</a>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Patient</th>
+              <th>Doctor</th>
+              <th>Time</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for appt in recent_appointments %}
+              <tr>
+                <td>
+                  <a href="{% url 'patient_detail' appt.patient.pk %}" class="fw-bold text-decoration-none text-dark">
+                    {{ appt.patient.full_name }}
+                  </a>
+                  <div class="text-muted small">{{ appt.patient.phone }}</div>
+                </td>
+                <td>
+                  <div class="small fw-semibold">{{ appt.doctor.doctor_name }}</div>
+                  <small class="text-muted">{{ appt.doctor.specialization }}</small>
+                </td>
+                <td>
+                  <div class="small fw-bold">{{ appt.appointment_date }}</div>
+                  <div class="text-muted small">{{ appt.appointment_time|time:"h:i A" }}</div>
+                </td>
+                <td>
+                  <span class="badge badge-status badge-{{ appt.status }}">
+                    {{ appt.get_status_display }}
+                  </span>
+                </td>
+                <td>
+                  <a href="{% url 'appointment_detail' appt.pk %}" class="btn btn-sm btn-outline-primary py-0 px-2">
+                    Open
+                  </a>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="5" class="text-center text-muted py-4">No appointments scheduled for today yet.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Diagnostic Orders -->
+  <div class="col-lg-5">
+    <div class="card card-custom p-4 h-100">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold text-dark mb-0"><i class="bi bi-droplet-half me-2 text-warning"></i>Recent Lab Orders</h5>
+        <a href="{% url 'lab_order_list' %}" class="small fw-bold text-decoration-none">View All</a>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Order Ref</th>
+              <th>Patient</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order in recent_lab_orders %}
+              <tr>
+                <td>
+                  <a href="{% url 'lab_order_detail' order.pk %}" class="fw-bold text-primary text-decoration-none">
+                    {{ order.order_number }}
+                  </a>
+                  <div class="text-muted small">{{ order.items.count }} tests • ₹{{ order.total_amount|floatformat:0 }}</div>
+                </td>
+                <td>
+                  <div class="small fw-semibold">{{ order.patient.full_name }}</div>
+                  <small class="text-muted">{{ order.order_date }}</small>
+                </td>
+                <td>
+                  <span class="badge bg-secondary bg-opacity-25 text-dark small">
+                    {{ order.get_status_display }}
+                  </span>
+                </td>
+                <td>
+                  <a href="{% url 'lab_order_detail' order.pk %}" class="btn btn-sm btn-outline-secondary py-0 px-2">
+                    Details
+                  </a>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="4" class="text-center text-muted py-4">No lab orders logged today yet.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

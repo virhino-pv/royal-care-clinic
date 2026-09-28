@@ -1,0 +1,97 @@
+{% extends 'dashboard_base.html' %}
+
+{% block title %}Lab Test Catalog — {{ CLINIC.NAME }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+  <div>
+    <h3 class="fw-bold mb-1">Diagnostic Investigation Directory</h3>
+    <p class="text-muted small mb-0">Standard reference ranges, test codes, turnaround schedules, and prices.</p>
+  </div>
+  <div>
+    <a href="{% url 'lab_order_create' %}" class="btn btn-primary-custom">
+      <i class="bi bi-cart-plus me-1"></i> New Lab Order
+    </a>
+  </div>
+</div>
+
+<div class="card card-custom p-3 mb-4">
+  <form method="GET" class="row g-2 align-items-center">
+    <div class="col-md-6">
+      <input type="text" name="search" class="form-control form-control-sm" placeholder="Search test name or code (e.g. CBC, Lipid, HbA1c)..." value="{{ search }}">
+    </div>
+    <div class="col-md-4">
+      <select name="category" class="form-select form-select-sm">
+        <option value="">-- All Diagnostic Categories --</option>
+        {% for cat in categories %}
+          <option value="{{ cat.id }}" {% if selected_category == cat.id|stringformat:"i" %}selected{% endif %}>{{ cat.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2 d-flex gap-2">
+      <button type="submit" class="btn btn-primary-custom btn-sm w-100">Filter</button>
+      {% if search or selected_category %}
+        <a href="{% url 'test_catalog' %}" class="btn btn-light btn-sm"><i class="bi bi-x-lg"></i></a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+
+<div class="card card-custom overflow-hidden">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0 small">
+      <thead class="table-light">
+        <tr>
+          <th>Code</th>
+          <th>Test Name</th>
+          <th>Category</th>
+          <th>Sample Type</th>
+          <th>Reference Interval</th>
+          <th>TAT</th>
+          <th>Price</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for test in tests %}
+          <tr>
+            <td>
+              <span class="badge bg-primary bg-opacity-10 text-primary fw-bold">{{ test.code }}</span>
+            </td>
+            <td>
+              <div class="fw-bold text-dark">{{ test.name }}</div>
+              {% if test.description %}
+                <small class="text-muted">{{ test.description|truncatewords:6 }}</small>
+              {% endif %}
+            </td>
+            <td>{{ test.category.name }}</td>
+            <td>
+              <span class="badge bg-light text-dark border">{{ test.sample_type }}</span>
+            </td>
+            <td>
+              {% if test.normal_range %}
+                <code>{{ test.normal_range }} {{ test.unit }}</code>
+              {% else %}
+                <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+            <td>{{ test.turnaround_hours }} Hours</td>
+            <td class="fw-bold text-primary fs-6">₹{{ test.price|floatformat:0 }}</td>
+            <td>
+              {% if test.is_active %}
+                <span class="badge bg-success bg-opacity-10 text-success">Active</span>
+              {% else %}
+                <span class="badge bg-danger bg-opacity-10 text-danger">Inactive</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="8" class="text-center text-muted py-4">No diagnostic tests matching your search.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

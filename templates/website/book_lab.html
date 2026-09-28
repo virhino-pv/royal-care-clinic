@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Diagnostic Lab Tests — {{ CLINIC.NAME }}{% endblock %}
+
+{% block content %}
+<div class="bg-primary text-white py-5">
+  <div class="container">
+    <h1 class="fw-bold mb-2">Book Diagnostic Laboratory Tests</h1>
+    <p class="text-white-50 mb-0">Select your required blood and diagnostic investigations with home sample pickup options.</p>
+  </div>
+</div>
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-9">
+      <div class="card card-custom p-4 p-md-5">
+        <form method="POST">
+          {% csrf_token %}
+          <h5 class="fw-bold text-primary mb-3 pb-2 border-bottom">1. Patient Contact Information</h5>
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Patient Full Name *</label>
+              <input type="text" name="first_name" class="form-control" required placeholder="Patient Name">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Mobile Phone (for WhatsApp Reports) *</label>
+              <input type="tel" name="phone" class="form-control" required placeholder="9840012345">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Email Address</label>
+              <input type="email" name="email" class="form-control" placeholder="name@domain.com">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Sample Collection Preference</label>
+              <select name="collection_type" class="form-select">
+                <option value="walk_in">Walk-in at Clinic (8, Vijayeswari St, Aminjikarai)</option>
+                <option value="home_collection">Request Home Sample Pickup (Aminjikarai & Nearby)</option>
+              </select>
+            </div>
+          </div>
+
+          <h5 class="fw-bold text-primary mb-3 pb-2 border-bottom">2. Select Required Diagnostic Investigations</h5>
+          <div class="row g-3 mb-4" style="max-height: 380px; overflow-y: auto;">
+            {% for test in tests %}
+              <div class="col-md-6">
+                <div class="p-3 border rounded-3 bg-light d-flex align-items-center justify-content-between">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="tests" value="{{ test.id }}" id="test_{{ test.id }}"
+                           {% if request.GET.test == test.id|stringformat:"i" %}checked{% endif %}>
+                    <label class="form-check-label fw-semibold small" for="test_{{ test.id }}">
+                      {{ test.name }} ({{ test.code }})
+                      <div class="text-muted" style="font-size: 0.75rem;">Sample: {{ test.sample_type }} • {{ test.turnaround_hours }}h</div>
+                    </label>
+                  </div>
+                  <span class="fw-bold text-primary">₹{{ test.price|floatformat:0 }}</span>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label small fw-semibold">Additional Notes / Doctor Prescription Details</label>
+            <textarea name="notes" class="form-control" rows="2" placeholder="e.g. Fasting 12 hours completed, referring doctor name, or specific instructions."></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-secondary-custom btn-lg w-100">
+            <i class="bi bi-cart-check-fill me-1"></i> Submit Diagnostic Test Request
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

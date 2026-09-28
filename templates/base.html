@@ -1,0 +1,211 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{{ CLINIC.NAME }} — Healthcare & Diagnostic Excellence{% endblock %}</title>
+  
+  <!-- Meta SEO -->
+  <meta name="description" content="Royal Care Clinic & Lab in Aminjikarai, Chennai. Comprehensive general & specialist consultations, full-service diagnostic laboratory, instant online appointment booking. Powered by Virhino.com.">
+  <meta name="keywords" content="Royal Care Clinic, Diagnostic Lab Aminjikarai, Doctor Consultation Chennai, Blood Test Aminjikarai, Clinic Near Me, Razaak Garden Clinic">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Bootstrap 5 CSS & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <!-- Custom Style -->
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <div class="top-bar d-none d-lg-block">
+    <div class="container d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center gap-4">
+        <span><i class="bi bi-geo-alt-fill text-danger me-1"></i> {{ CLINIC.ADDRESS }}</span>
+        <span><i class="bi bi-clock-fill text-warning me-1"></i> {{ CLINIC.HOURS_WEEKDAY }}</span>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <a href="tel:{{ CLINIC.PHONE }}"><i class="bi bi-telephone-fill me-1"></i> {{ CLINIC.PHONE }}</a>
+        <span class="text-white-50">|</span>
+        <a href="{{ CLINIC.BRAND_URL }}" target="_blank" class="badge bg-light text-dark text-decoration-none fw-bold">
+          <i class="bi bi-shield-check text-primary me-1"></i>{{ CLINIC.BRAND }}
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'home' %}">
+        <div class="bg-primary text-white p-2 rounded-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 42px; height: 42px;">
+          <i class="bi bi-hospital fs-4"></i>
+        </div>
+        <div>
+          <div class="brand-logo-text">{{ CLINIC.NAME }}</div>
+          <span class="brand-badge"><i class="bi bi-patch-check-fill me-1"></i>CLINIC & DIAGNOSTICS</span>
+        </div>
+      </a>
+
+      <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarMain">
+        <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">Home</a></li>
+          <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}" href="{% url 'about' %}">About Clinic</a></li>
+          <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'doctors' %}active{% endif %}" href="{% url 'doctors' %}">Doctors</a></li>
+          <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'services' %}active{% endif %}" href="{% url 'services' %}">Medical Care</a></li>
+          <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'lab_services' %}active{% endif %}" href="{% url 'lab_services' %}">Lab Tests</a></li>
+          <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'timings' %}active{% endif %}" href="{% url 'timings' %}">Timings</a></li>
+          <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}" href="{% url 'contact' %}">Contact & Location</a></li>
+        </ul>
+
+        <div class="d-flex align-items-center gap-2">
+          <a href="{% url 'book_appointment' %}" class="btn btn-secondary-custom btn-sm">
+            <i class="bi bi-calendar-check me-1"></i> Book Slot
+          </a>
+          {% if user.is_authenticated %}
+            <a href="{% url 'dashboard' %}" class="btn btn-primary-custom btn-sm">
+              <i class="bi bi-speedometer2 me-1"></i> Portal
+            </a>
+          {% else %}
+            <a href="{% url 'login' %}" class="btn btn-outline-primary btn-sm fw-semibold">
+              <i class="bi bi-box-arrow-in-right me-1"></i> Staff Login
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Flash Messages -->
+  {% if messages %}
+    <div class="container mt-3">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show shadow-sm" role="alert">
+          <i class="bi bi-info-circle-fill me-2"></i>{{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Main Body Content -->
+  {% block content %}{% endblock %}
+
+  <!-- Floating Call & WhatsApp Buttons -->
+  <div class="floating-cta-container">
+    <a href="https://wa.me/{{ CLINIC.WHATSAPP }}?text=Hello%20Royal%20Care%20Clinic,%20I%20would%20like%20to%20inquire%20about%20doctor%20appointments%20and%20lab%20tests." 
+       target="_blank" class="btn-floating btn-whatsapp shadow" title="Chat on WhatsApp" id="whatsapp-floating-btn">
+      <i class="bi bi-whatsapp"></i>
+    </a>
+    <a href="tel:{{ CLINIC.PHONE }}" class="btn-floating btn-call shadow" title="Call Clinic Now" id="call-floating-btn">
+      <i class="bi bi-telephone-fill"></i>
+    </a>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white pt-5 pb-4 mt-5 border-top border-secondary">
+    <div class="container">
+      <div class="row g-4">
+        <!-- Col 1: Brand & Address -->
+        <div class="col-lg-4 col-md-6">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <div class="bg-primary text-white p-2 rounded-3 d-flex align-items-center justify-content-center">
+              <i class="bi bi-hospital fs-4"></i>
+            </div>
+            <h5 class="text-white mb-0">{{ CLINIC.NAME }}</h5>
+          </div>
+          <p class="text-white-50 small mb-3">
+            Providing compassionate outpatient clinical consultations and precision diagnostic laboratory testing with state-of-the-art medical technology in Aminjikarai, Chennai.
+          </p>
+          <div class="d-flex flex-column gap-2 text-white-50 small">
+            <div><i class="bi bi-geo-alt-fill text-danger me-2"></i>{{ CLINIC.ADDRESS }}</div>
+            <div><i class="bi bi-telephone-fill text-success me-2"></i>{{ CLINIC.PHONE }} / {{ CLINIC.LANDLINE }}</div>
+            <div><i class="bi bi-envelope-fill text-info me-2"></i>{{ CLINIC.EMAIL }}</div>
+          </div>
+        </div>
+
+        <!-- Col 2: Quick Links -->
+        <div class="col-lg-2 col-md-6">
+          <h6 class="text-white text-uppercase fw-bold mb-3">Navigation</h6>
+          <ul class="list-unstyled text-white-50 small d-flex flex-column gap-2">
+            <li><a href="{% url 'home' %}" class="text-white-50 text-decoration-none hover-white">Home</a></li>
+            <li><a href="{% url 'about' %}" class="text-white-50 text-decoration-none hover-white">About Us</a></li>
+            <li><a href="{% url 'doctors' %}" class="text-white-50 text-decoration-none hover-white">Our Specialists</a></li>
+            <li><a href="{% url 'services' %}" class="text-white-50 text-decoration-none hover-white">Clinical Services</a></li>
+            <li><a href="{% url 'lab_services' %}" class="text-white-50 text-decoration-none hover-white">Diagnostic Menu</a></li>
+            <li><a href="{% url 'contact' %}" class="text-white-50 text-decoration-none hover-white">Contact & Directions</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3: Operating Hours -->
+        <div class="col-lg-3 col-md-6">
+          <h6 class="text-white text-uppercase fw-bold mb-3">Clinic Timings</h6>
+          <div class="bg-secondary bg-opacity-25 p-3 rounded-3 text-white-50 small">
+            <div class="d-flex justify-content-between py-1 border-bottom border-secondary">
+              <span class="text-white">Monday - Saturday:</span>
+              <span class="text-warning">7:30 AM - 9:30 PM</span>
+            </div>
+            <div class="d-flex justify-content-between py-1 border-bottom border-secondary">
+              <span class="text-white">Sunday:</span>
+              <span class="text-warning">8:00 AM - 1:00 PM</span>
+            </div>
+            <div class="d-flex justify-content-between py-1">
+              <span class="text-white">Lab Sample Collection:</span>
+              <span class="text-success">From 7:30 AM</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Col 4: Virhino Brand & Emergency -->
+        <div class="col-lg-3 col-md-6">
+          <h6 class="text-white text-uppercase fw-bold mb-3">Technology Partner</h6>
+          <div class="p-3 bg-primary bg-opacity-20 border border-primary border-opacity-25 rounded-3 mb-3">
+            <div class="small fw-bold text-white mb-1">{{ CLINIC.BRAND }}</div>
+            <p class="text-white-50 small mb-2">
+              Advanced Digital Clinic Management & Healthcare Analytics System.
+            </p>
+            <a href="{{ CLINIC.BRAND_URL }}" target="_blank" class="btn btn-outline-light btn-sm w-100">
+              Visit Virhino.com <i class="bi bi-box-arrow-up-right ms-1"></i>
+            </a>
+          </div>
+          <div class="text-center">
+            <a href="tel:{{ CLINIC.PHONE }}" class="btn btn-danger btn-sm w-100 fw-bold">
+              <i class="bi bi-telephone-outbound-fill me-1"></i> Call Clinic: {{ CLINIC.PHONE }}
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <hr class="border-secondary my-4">
+
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-center small text-white-50">
+        <div>
+          &copy; 2026 {{ CLINIC.NAME }}. All Rights Reserved.
+        </div>
+        <div>
+          Digital Healthcare Platform {{ CLINIC.BRAND }}
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Chart.js for analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

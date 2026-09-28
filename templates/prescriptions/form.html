@@ -1,0 +1,100 @@
+{% extends 'dashboard_base.html' %}
+
+{% block title %}{{ title }} — {{ CLINIC.NAME }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <a href="{% url 'appointment_detail' appointment.id %}" class="small text-muted text-decoration-none"><i class="bi bi-arrow-left"></i> Back to Appointment</a>
+    <h3 class="fw-bold mb-0 mt-1">{{ title }}</h3>
+    <span class="text-muted small">Doctor: <strong>{{ appointment.doctor.doctor_name }}</strong></span>
+  </div>
+</div>
+
+<div class="card card-custom p-4 p-md-5">
+  <form method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="appointment" value="{{ appointment.id }}">
+
+    <!-- Clinical Vitals -->
+    <h5 class="fw-bold text-primary mb-3 pb-2 border-bottom">1. Patient Vitals & Clinical Examination</h5>
+    <div class="row g-3 mb-4">
+      <div class="col-md-3">
+        <label class="form-label small fw-semibold">Blood Pressure</label>
+        {{ form.blood_pressure }}
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small fw-semibold">Pulse Rate</label>
+        {{ form.pulse_rate }}
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small fw-semibold">Temperature</label>
+        {{ form.temperature }}
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small fw-semibold">Weight (kg)</label>
+        {{ form.weight_kg }}
+      </div>
+      <div class="col-md-6">
+        <label class="form-label small fw-semibold">Chief Complaints</label>
+        {{ form.chief_complaints }}
+      </div>
+      <div class="col-md-6">
+        <label class="form-label small fw-semibold">Diagnosis *</label>
+        {{ form.diagnosis }}
+      </div>
+    </div>
+
+    <!-- Medicines FormSet -->
+    <h5 class="fw-bold text-primary mb-3 pb-2 border-bottom">2. Rx — Medicine & Dosage Prescription</h5>
+    {{ formset.management_form }}
+    <div class="table-responsive mb-4">
+      <table class="table table-bordered align-middle small">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 30%;">Medicine Name & Strength *</th>
+            <th style="width: 15%;">Dosage</th>
+            <th style="width: 25%;">Frequency</th>
+            <th style="width: 10%;">Days</th>
+            <th style="width: 20%;">Instructions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for med_form in formset %}
+            <tr>
+              <td>
+                {{ med_form.id }}
+                {{ med_form.medicine_name }}
+              </td>
+              <td>{{ med_form.dosage }}</td>
+              <td>{{ med_form.frequency }}</td>
+              <td>{{ med_form.duration_days }}</td>
+              <td>{{ med_form.instructions }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Advice & Followup -->
+    <h5 class="fw-bold text-primary mb-3 pb-2 border-bottom">3. Dietary Advice & Review Schedule</h5>
+    <div class="row g-3 mb-4">
+      <div class="col-md-8">
+        <label class="form-label small fw-semibold">General Advice & Lifestyle Instructions</label>
+        {{ form.advice_diet }}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label small fw-semibold">Next Follow-Up Date</label>
+        {{ form.follow_up_date }}
+      </div>
+    </div>
+
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-primary-custom px-4">
+        <i class="bi bi-prescription2 me-1"></i> Save & Sign Prescription
+      </button>
+      <a href="{% url 'appointment_detail' appointment.id %}" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Us & Location — {{ CLINIC.NAME }}{% endblock %}
+
+{% block content %}
+<div class="bg-primary text-white py-5">
+  <div class="container">
+    <h1 class="fw-bold mb-2">Contact & Clinic Location</h1>
+    <p class="text-white-50 mb-0">Reach our front desk or navigate directly to our Aminjikarai clinic in Chennai.</p>
+  </div>
+</div>
+
+<div class="container py-5">
+  <div class="row g-5">
+    <div class="col-lg-5">
+      <h3 class="fw-bold text-primary mb-3">Get in Touch</h3>
+      <p class="text-muted">
+        Whether you have questions regarding doctor schedules, lab sample preparation, home collection, or health checkup packages, our desk is ready to assist.
+      </p>
+
+      <div class="d-flex flex-column gap-3 mb-4">
+        <div class="d-flex align-items-start gap-3 p-3 bg-white border rounded-3 shadow-sm">
+          <i class="bi bi-geo-alt-fill text-danger fs-3"></i>
+          <div>
+            <h6 class="fw-bold text-dark mb-1">Clinic Address</h6>
+            <div class="text-muted small">{{ CLINIC.ADDRESS }}</div>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-start gap-3 p-3 bg-white border rounded-3 shadow-sm">
+          <i class="bi bi-telephone-fill text-primary fs-3"></i>
+          <div>
+            <h6 class="fw-bold text-dark mb-1">Phone Numbers</h6>
+            <div class="text-muted small">Mobile: <a href="tel:{{ CLINIC.PHONE }}" class="fw-bold text-primary">{{ CLINIC.PHONE }}</a></div>
+            <div class="text-muted small">Landline: <a href="tel:{{ CLINIC.LANDLINE }}" class="text-decoration-none">{{ CLINIC.LANDLINE }}</a></div>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-start gap-3 p-3 bg-white border rounded-3 shadow-sm">
+          <i class="bi bi-whatsapp text-success fs-3"></i>
+          <div>
+            <h6 class="fw-bold text-dark mb-1">WhatsApp Helpdesk</h6>
+            <div class="text-muted small">+{{ CLINIC.WHATSAPP }} (Instant chat for test inquiries & reports)</div>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-start gap-3 p-3 bg-white border rounded-3 shadow-sm">
+          <i class="bi bi-envelope-fill text-info fs-3"></i>
+          <div>
+            <h6 class="fw-bold text-dark mb-1">Official Email</h6>
+            <div class="text-muted small">{{ CLINIC.EMAIL }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex gap-3">
+        <a href="tel:{{ CLINIC.PHONE }}" class="btn btn-primary-custom flex-grow-1">
+          <i class="bi bi-telephone-fill me-1"></i> Call Clinic
+        </a>
+        <a href="https://wa.me/{{ CLINIC.WHATSAPP }}" target="_blank" class="btn btn-success flex-grow-1">
+          <i class="bi bi-whatsapp me-1"></i> WhatsApp
+        </a>
+      </div>
+    </div>
+
+    <!-- Contact Form & Map -->
+    <div class="col-lg-7">
+      <div class="card card-custom p-4 mb-4">
+        <h5 class="fw-bold text-dark mb-3">Send Us a Direct Message</h5>
+        <form method="POST">
+          {% csrf_token %}
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Your Full Name *</label>
+              <input type="text" name="name" class="form-control" required placeholder="John Doe">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Phone Number *</label>
+              <input type="tel" name="phone" class="form-control" required placeholder="9840012345">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Email Address</label>
+            <input type="email" name="email" class="form-control" placeholder="john@example.com">
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Subject / Inquiry Type</label>
+            <select name="subject" class="form-select">
+              <option value="Appointment Inquiry">Doctor Appointment Inquiry</option>
+              <option value="Lab Test Information">Diagnostic Lab Test / Price Info</option>
+              <option value="Home Sample Collection">Home Sample Pickup Request</option>
+              <option value="Feedback">Feedback / Other Queries</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Your Message</label>
+            <textarea name="message" class="form-control" rows="3" placeholder="Tell us how we can help you..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary-custom">
+            <i class="bi bi-send-fill me-1"></i> Submit Inquiry
+          </button>
+        </form>
+      </div>
+
+      <!-- Google Maps Embed -->
+      <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <iframe 
+          src="{{ CLINIC.MAP_EMBED_URL }}" 
+          width="100%" 
+          height="320" 
+          style="border:0;" 
+          allowfullscreen="" 
+          loading="lazy" 
+          title="Google Map Directions">
+        </iframe>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

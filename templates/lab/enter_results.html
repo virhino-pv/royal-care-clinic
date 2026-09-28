@@ -1,0 +1,64 @@
+{% extends 'dashboard_base.html' %}
+
+{% block title %}Enter Lab Results #{{ order.order_number }} — {{ CLINIC.NAME }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <a href="{% url 'lab_order_detail' order.pk %}" class="small text-muted text-decoration-none"><i class="bi bi-arrow-left"></i> Back to Order</a>
+    <h3 class="fw-bold mb-0 mt-1">Enter Results: {{ order.order_number }}</h3>
+    <span class="text-muted small">Patient: <strong>{{ order.patient.full_name }}</strong> ({{ order.patient.age }} yrs / {{ order.patient.gender }})</span>
+  </div>
+</div>
+
+<div class="card card-custom p-4">
+  <form method="POST">
+    {% csrf_token %}
+    <div class="table-responsive mb-4">
+      <table class="table table-bordered align-middle mb-0">
+        <thead class="table-light small">
+          <tr>
+            <th style="width: 25%;">Investigation / Test</th>
+            <th style="width: 25%;">Result Value *</th>
+            <th style="width: 15%;">Unit</th>
+            <th style="width: 20%;">Biological Reference Range</th>
+            <th style="width: 15%;">Abnormal?</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in order.items.all %}
+            <tr>
+              <td>
+                <div class="fw-bold">{{ item.test.name }}</div>
+                <small class="text-muted">{{ item.test.code }} • {{ item.test.sample_type }}</small>
+              </td>
+              <td>
+                <input type="text" name="result_{{ item.id }}" class="form-control" value="{{ item.result_value }}" placeholder="Enter observed value" required>
+              </td>
+              <td>
+                <span class="badge bg-light text-dark border">{{ item.unit|default:"—" }}</span>
+              </td>
+              <td>
+                <span class="text-muted small">{{ item.reference_range|default:"Standard" }}</span>
+              </td>
+              <td>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" name="abnormal_{{ item.id }}" id="ab_{{ item.id }}" {% if item.is_abnormal %}checked{% endif %}>
+                  <label class="form-check-label text-danger small fw-semibold" for="ab_{{ item.id }}">Mark Abnormal</label>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-success px-4">
+        <i class="bi bi-check2-circle me-1"></i> Save & Verify Diagnostic Results
+      </button>
+      <a href="{% url 'lab_order_detail' order.pk %}" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
