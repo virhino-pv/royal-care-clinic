@@ -2,7 +2,7 @@ import os
 import sys
 from pathlib import Path
 
-# Ensure root project directory is in python search path
+# Add project root directory to sys.path
 BASE_DIR = Path(__file__).resolve().parent.parent
 if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
@@ -11,5 +11,4 @@ from django.core.wsgi import get_wsgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'royalcare_project.settings')
 
-application = get_wsgi_application()
-app = application
+app = get_wsgi_application()

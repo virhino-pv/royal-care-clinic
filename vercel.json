@@ -2,15 +2,18 @@
   "version": 2,
   "builds": [
     {
-      "src": "royalcare_project/wsgi.py",
-      "use": "@vercel/python",
-      "config": { "maxLambdaSize": "15mb", "runtime": "python3.12" }
+      "src": "api/index.py",
+      "use": "@vercel/python"
     }
   ],
   "routes": [
     {
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
+    },
+    {
       "src": "/(.*)",
-      "dest": "royalcare_project/wsgi.py"
+      "dest": "api/index.py"
     }
   ]
 }

@@ -1,20 +1,23 @@
 import os
+import sys
 from pathlib import Path
 from datetime import timedelta
-import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
 
-# Read .env file
-env = environ.Env()
-env_file = os.path.join(BASE_DIR, '.env')
-if os.path.exists(env_file):
-    environ.Env.read_env(env_file)
+# Read .env file if available
+try:
+    from dotenv import load_dotenv
+    load_dotenv(BASE_DIR / '.env')
+except ImportError:
+    pass
 
-SECRET_KEY = env('SECRET_KEY', default='django-insecure-royalcare-secret-key-default-2026')
-DEBUG = env.bool('DEBUG', default=True)
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-royalcare-secret-key-prod-2026')
+DEBUG = os.environ.get('DEBUG', 'True').lower() in ['true', '1', 'yes']
 
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['*'])
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 INSTALLED_APPS = [
@@ -76,7 +79,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'royalcare_project.wsgi.application'
 
 # Database Configuration
-USE_SQLITE = env.bool('USE_SQLITE', default=True)
+USE_SQLITE = os.environ.get('USE_SQLITE', 'True').lower() in ['true', '1']
 
 if USE_SQLITE:
     DATABASES = {
@@ -89,11 +92,11 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': env('DB_NAME', default='royalcare_db'),
-            'USER': env('DB_USER', default='root'),
-            'PASSWORD': env('DB_PASSWORD', default=''),
-            'HOST': env('DB_HOST', default='localhost'),
-            'PORT': env('DB_PORT', default='3306'),
+            'NAME': os.environ.get('DB_NAME', 'royalcare_db'),
+            'USER': os.environ.get('DB_USER', 'root'),
+            'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+            'HOST': os.environ.get('DB_HOST', 'localhost'),
+            'PORT': os.environ.get('DB_PORT', '3306'),
             'OPTIONS': {
                 'charset': 'utf8mb4',
             },
@@ -123,7 +126,11 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
-CSRF_TRUSTED_ORIGINS = ['https://*.vercel.app', 'http://localhost:8000', 'http://127.0.0.1:8000']
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.vercel.app',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000'
+]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -155,20 +162,20 @@ SIMPLE_JWT = {
 }
 
 # Email settings
-EMAIL_BACKEND = env('EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')
-DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='Royal Care Clinic & Lab <noreply@royalcareclinic.in>')
+EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'Royal Care Clinic & Lab <noreply@royalcareclinic.in>')
 
 # Clinic Metadata
 CLINIC_METADATA = {
-    'NAME': env('CLINIC_NAME', default='Royal Care Clinic & Lab'),
-    'TAGLINE': env('CLINIC_TAGLINE', default='Excellence in Healthcare & Diagnostic Precision'),
-    'ADDRESS': env('CLINIC_ADDRESS', default='8, Vijayeswari Street, Razaak Garden, Ayyavoo Colony, Aminjikarai, Chennai, Tamil Nadu 600029.'),
-    'PHONE': env('CLINIC_PHONE', default='+91 98400 12345'),
-    'LANDLINE': env('CLINIC_LANDLINE', default='044-2365 7890'),
-    'WHATSAPP': env('CLINIC_WHATSAPP', default='919840012345'),
-    'EMAIL': env('CLINIC_EMAIL', default='contact@royalcareclinic.in'),
-    'BRAND': env('BRAND_POWERED_BY', default='Powered by Virhino.com'),
-    'BRAND_URL': env('BRAND_URL', default='https://virhino.com'),
+    'NAME': os.environ.get('CLINIC_NAME', 'Royal Care Clinic & Lab'),
+    'TAGLINE': os.environ.get('CLINIC_TAGLINE', 'Excellence in Healthcare & Diagnostic Precision'),
+    'ADDRESS': os.environ.get('CLINIC_ADDRESS', '8, Vijayeswari Street, Razaak Garden, Ayyavoo Colony, Aminjikarai, Chennai, Tamil Nadu 600029.'),
+    'PHONE': os.environ.get('CLINIC_PHONE', '+91 98400 12345'),
+    'LANDLINE': os.environ.get('CLINIC_LANDLINE', '044-2365 7890'),
+    'WHATSAPP': os.environ.get('CLINIC_WHATSAPP', '919840012345'),
+    'EMAIL': os.environ.get('CLINIC_EMAIL', 'contact@royalcareclinic.in'),
+    'BRAND': os.environ.get('BRAND_POWERED_BY', 'Powered by Virhino.com'),
+    'BRAND_URL': os.environ.get('BRAND_URL', 'https://virhino.com'),
     'HOURS_WEEKDAY': 'Mon - Sat: 07:30 AM - 09:30 PM',
     'HOURS_SUNDAY': 'Sunday: 08:00 AM - 01:00 PM',
     'MAP_EMBED_URL': 'https://maps.google.com/maps?q=8,+Vijayeswari+Street,+Razaak+Garden,+Ayyavoo+Colony,+Aminjikarai,+Chennai,+Tamil+Nadu+600029&t=&z=16&ie=UTF8&iwloc=&output=embed',
