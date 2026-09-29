@@ -46,6 +46,12 @@ def timings(request):
     doctors = Doctor.objects.filter(is_available=True).select_related('user')
     return render(request, 'website/timings.html', {'doctors': doctors})
 
+def gallery(request):
+    return render(request, 'website/gallery.html')
+
+def faq(request):
+    return render(request, 'website/faq.html')
+
 def contact(request):
     if request.method == 'POST':
         name = request.POST.get('name')

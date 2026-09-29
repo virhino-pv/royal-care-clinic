@@ -68,7 +68,9 @@
           <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'services' %}active{% endif %}" href="{% url 'services' %}">Medical Care</a></li>
           <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'lab_services' %}active{% endif %}" href="{% url 'lab_services' %}">Lab Tests</a></li>
           <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'timings' %}active{% endif %}" href="{% url 'timings' %}">Timings</a></li>
-          <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}" href="{% url 'contact' %}">Contact & Location</a></li>
+          <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'gallery' %}active{% endif %}" href="{% url 'gallery' %}">Gallery</a></li>
+          <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'faq' %}active{% endif %}" href="{% url 'faq' %}">FAQ</a></li>
+          <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}" href="{% url 'contact' %}">Contact</a></li>
         </ul>
 
         <div class="d-flex align-items-center gap-2">
@@ -146,6 +148,8 @@
             <li><a href="{% url 'doctors' %}" class="text-white-50 text-decoration-none hover-white">Our Specialists</a></li>
             <li><a href="{% url 'services' %}" class="text-white-50 text-decoration-none hover-white">Clinical Services</a></li>
             <li><a href="{% url 'lab_services' %}" class="text-white-50 text-decoration-none hover-white">Diagnostic Menu</a></li>
+            <li><a href="{% url 'gallery' %}" class="text-white-50 text-decoration-none hover-white">Clinic Gallery</a></li>
+            <li><a href="{% url 'faq' %}" class="text-white-50 text-decoration-none hover-white">Patient FAQs</a></li>
             <li><a href="{% url 'contact' %}" class="text-white-50 text-decoration-none hover-white">Contact & Directions</a></li>
           </ul>
         </div>

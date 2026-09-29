@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+
+{% block title %}Frequently Asked Questions (FAQ) — {{ CLINIC.NAME }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="bg-primary text-white py-5">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-8">
+        <span class="badge bg-light text-primary fw-bold mb-2 text-uppercase">Help & Patient Guide</span>
+        <h1 class="fw-bold mb-2">Frequently Asked Questions (FAQ)</h1>
+        <p class="text-white-50 mb-0">Find quick answers to common questions about doctor consultations, lab test fasting, report timings, and payments.</p>
+      </div>
+      <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+        <a href="{% url 'book_appointment' %}" class="btn btn-secondary-custom shadow-sm">
+          <i class="bi bi-calendar-check me-1"></i> Book Appointment
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FAQ Content -->
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+
+      <!-- Category 1: Doctor Consultations -->
+      <div class="mb-5">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <div class="bg-primary text-white p-2 rounded-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+            <i class="bi bi-person-badge fs-5"></i>
+          </div>
+          <h4 class="fw-bold text-dark mb-0">1. Doctor Appointments & Consultations</h4>
+        </div>
+
+        <div class="accordion accordion-custom shadow-sm rounded-3" id="faqAccordionDoctor">
+          <!-- Q1 -->
+          <div class="accordion-item border mb-2 rounded-3 overflow-hidden">
+            <h2 class="accordion-header" id="faqHeading1">
+              <button class="accordion-button fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1" aria-expanded="true" aria-controls="faqCollapse1">
+                How do I book a doctor appointment online?
+              </button>
+            </h2>
+            <div id="faqCollapse1" class="accordion-collapse collapse show" aria-labelledby="faqHeading1" data-bs-parent="#faqAccordionDoctor">
+              <div class="accordion-body text-muted small">
+                You can book an appointment directly through our website by visiting the <a href="{% url 'book_appointment' %}" class="fw-bold text-primary">Book Appointment</a> page. Select your preferred doctor, clinical specialty, date, and available time slot. You will receive an instant confirmation.
+              </div>
+            </div>
+          </div>
+
+          <!-- Q2 -->
+          <div class="accordion-item border mb-2 rounded-3 overflow-hidden">
+            <h2 class="accordion-header" id="faqHeading2">
+              <button class="accordion-button collapsed fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2" aria-expanded="false" aria-controls="faqCollapse2">
+                Are walk-in consultations accepted without prior booking?
+              </button>
+            </h2>
+            <div id="faqCollapse2" class="accordion-collapse collapse" aria-labelledby="faqHeading2" data-bs-parent="#faqAccordionDoctor">
+              <div class="accordion-body text-muted small">
+                Yes! We welcome walk-in patients for general consultations and acute care. However, prior booking is recommended to minimize waiting time, especially for specialist doctors (Cardiologist, Diabetologist, Pediatrician, Gynecologist).
+              </div>
+            </div>
+          </div>
+
+          <!-- Q3 -->
+          <div class="accordion-item border rounded-3 overflow-hidden">
+            <h2 class="accordion-header" id="faqHeading3">
+              <button class="accordion-button collapsed fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse3" aria-expanded="false" aria-controls="faqCollapse3">
+                Can I reschedule or cancel my appointment?
+              </button>
+            </h2>
+            <div id="faqCollapse3" class="accordion-collapse collapse" aria-labelledby="faqHeading3" data-bs-parent="#faqAccordionDoctor">
+              <div class="accordion-body text-muted small">
+                Yes. You can call our reception desk at <a href="tel:{{ CLINIC.PHONE }}" class="fw-bold text-primary">{{ CLINIC.PHONE }}</a> or message us on WhatsApp at least 1 hour prior to your scheduled time slot to reschedule.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category 2: Diagnostic Lab & Tests -->
+      <div class="mb-5">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <div class="bg-info text-white p-2 rounded-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+            <i class="bi bi-droplet-half fs-5"></i>
+          </div>
+          <h4 class="fw-bold text-dark mb-0">2. Laboratory Diagnostic Testing</h4>
+        </div>
+
+        <div class="accordion accordion-custom shadow-sm rounded-3" id="faqAccordionLab">
+          <!-- Q4 -->
+          <div class="accordion-item border mb-2 rounded-3 overflow-hidden">
+            <h2 class="accordion-header" id="faqHeading4">
+              <button class="accordion-button fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse4" aria-expanded="true" aria-controls="faqCollapse4">
+                What time does blood sample collection start?
+              </button>
+            </h2>
+            <div id="faqCollapse4" class="accordion-collapse collapse show" aria-labelledby="faqHeading4" data-bs-parent="#faqAccordionLab">
+              <div class="accordion-body text-muted small">
+                Our diagnostic laboratory begins sample collection promptly at <strong>7:30 AM</strong> from Monday to Saturday, and at <strong>8:00 AM</strong> on Sundays to accommodate fasting glucose and lipid profile tests.
+              </div>
+            </div>
+          </div>
+
+          <!-- Q5 -->
+          <div class="accordion-item border mb-2 rounded-3 overflow-hidden">
+            <h2 class="accordion-header" id="faqHeading5">
+              <button class="accordion-button collapsed fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse5" aria-expanded="false" aria-controls="faqCollapse5">
+                Which blood tests require 10-12 hours of overnight fasting?
+              </button>
+            </h2>
+            <div id="faqCollapse5" class="accordion-collapse collapse" aria-labelledby="faqHeading5" data-bs-parent="#faqAccordionLab">
+              <div class="accordion-body text-muted small">
+                Fasting is mandatory for:
+                <ul class="mb-0 mt-1">
+                  <li><strong>Fasting Blood Sugar (FBS)</strong> — 8 to 10 hours of fasting.</li>
+                  <li><strong>Lipid Profile (Cholesterol, Triglycerides, HDL, LDL)</strong> — 10 to 12 hours.</li>
+                  <li><strong>Liver Function Test (LFT) & Master Health Checks</strong> — 10 hours.</li>
+                </ul>
+                You may drink plain water during the fasting window.
+              </div>
+            </div>
+          </div>
+
+          <!-- Q6 -->
+          <div class="accordion-item border rounded-3 overflow-hidden">
+            <h2 class="accordion-header" id="faqHeading6">
+              <button class="accordion-button collapsed fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse6" aria-expanded="false" aria-controls="faqCollapse6">
+                How quickly will I receive my test results?
+              </button>
+            </h2>
+            <div id="faqCollapse6" class="accordion-collapse collapse" aria-labelledby="faqHeading6" data-bs-parent="#faqAccordionLab">
+              <div class="accordion-body text-muted small">
+                Routine tests like Complete Blood Count (CBC), Urine Routine, and Blood Sugar are ready within <strong>2 to 4 hours</strong>. Specialized panels (Thyroid, HbA1c, Vitamin D/B12, Culture) are completed the same evening or within 24 hours. Digital copies are delivered via WhatsApp/SMS.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category 3: Payments & Insurance -->
+      <div class="mb-5">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <div class="bg-success text-white p-2 rounded-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+            <i class="bi bi-wallet2 fs-5"></i>
+          </div>
+          <h4 class="fw-bold text-dark mb-0">3. Payments & Billing</h4>
+        </div>
+
+        <div class="accordion accordion-custom shadow-sm rounded-3" id="faqAccordionBilling">
+          <div class="accordion-item border mb-2 rounded-3 overflow-hidden">
+            <h2 class="accordion-header" id="faqHeading7">
+              <button class="accordion-button fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse7" aria-expanded="true" aria-controls="faqCollapse7">
+                What payment methods are accepted at the clinic?
+              </button>
+            </h2>
+            <div id="faqCollapse7" class="accordion-collapse collapse show" aria-labelledby="faqHeading7" data-bs-parent="#faqAccordionBilling">
+              <div class="accordion-body text-muted small">
+                We accept all major payment modes: <strong>Cash, UPI (GPay, PhonePe, Paytm), Credit Cards, Debit Cards, and Net Banking</strong>. GST-compliant printed and digital invoices are issued for all services.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Still have questions banner -->
+      <div class="p-4 rounded-4 bg-primary text-white d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 shadow-sm">
+        <div>
+          <h5 class="fw-bold mb-1">Have a specific medical query?</h5>
+          <p class="text-white-50 small mb-0">Our front desk team and clinical staff are happy to assist you.</p>
+        </div>
+        <div class="d-flex gap-2">
+          <a href="tel:{{ CLINIC.PHONE }}" class="btn btn-light text-primary fw-bold btn-sm">
+            <i class="bi bi-telephone-fill me-1"></i> {{ CLINIC.PHONE }}
+          </a>
+          <a href="https://wa.me/{{ CLINIC.WHATSAPP }}" target="_blank" class="btn btn-success btn-sm fw-bold">
+            <i class="bi bi-whatsapp me-1"></i> WhatsApp
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
